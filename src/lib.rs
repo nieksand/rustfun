@@ -29,6 +29,11 @@ use rand::Rng;
  * Randomly shuffle vector using Durstenfeld's variant of Fisher-Yates.
  */
 pub fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
+	// nothing to do
+	if dat.len() < 2 {
+		return;
+	}
+
 	let mut rng = rand::thread_rng();
 
 	let mut j = dat.len();	// offset to shuffled region
@@ -110,7 +115,7 @@ fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
 	assert!(max <= dat.len(), "qsort max extent gt vector len");
 
 	// recursion base case
-	if max - min <= 1 {
+	if max - min < 2 {
 		return;
 	}
 
@@ -186,7 +191,7 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
 	assert!(max <= dat.len(), "qselect max extent gt vector len");
 
 	// recursion base case
-	if max - min <= 1 {
+	if max - min < 2 {
 		return;
 	}
 
@@ -254,7 +259,7 @@ pub fn merge_sort(dat: &mut Vec<i32>) {
 fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<i32>) {
 
 	// empty and single-element list already sorted
-	if max-min <= 1 {
+	if max - min < 2 {
 		return;
 	}
 
@@ -310,26 +315,21 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
  */
 pub fn make_max_heap(dat: &mut Vec<i32>) {
 	// nothing to do
-	if dat.len() <= 1 {
+	if dat.len() < 2 {
 		return;
 	}
 
-	// start by establish heap property on far-right subtree
 	fn parent_idx(node_idx: usize) -> usize {
 		return (node_idx-1)/2;
 	}
+
+	// start by establish heap property on far-right subtree
+	// sweep there to begin of array, inclusive
 	let end = dat.len();
-	let mut root_idx = parent_idx(end-1);
-
-
-	// toss in new element to root, sift-down to proper home
-	loop {
+	let far_right = parent_idx(end-1);
+	for i in 0..far_right+1 {
+		let root_idx = far_right - i;
 		sift_down(dat, root_idx, end);
-		root_idx -= 1;
-
-		if root_idx == 0 {
-			break;
-		}
 	}
 }
 
@@ -431,6 +431,21 @@ mod tests {
 		quick_sort(&mut v2);
 		assert!(v1 == origin, "resorted v1 missing elements");
 		assert!(v2 == origin, "resorted v2 missing elements");
+	}
+
+	#[test]
+	fn test_fisher_yates_shuffle_degenerate() {
+		let mut v1 : Vec<i32> = vec![];
+		fisher_yates_shuffle(&mut v1);
+		assert!(v1 == vec![], "empty vector unchanged by shuffle");
+
+		let mut v2 : Vec<i32> = vec![6];
+		fisher_yates_shuffle(&mut v2);
+		assert!(v2 == vec![6], "one-element vector unchanged by shuffle");
+
+		let mut v3 : Vec<i32> = vec![10,15];
+		fisher_yates_shuffle(&mut v3);
+		assert!(v3.len() == 2, "two-element vector same size post-shuffle");
 	}
 
 	#[test]
@@ -568,24 +583,32 @@ mod tests {
 
 	#[test]
 	fn test_make_max_heap() {
-		let mut dat: Vec<i32> = (0..3).collect();
-		make_max_heap(&mut dat);
+		// try degenerate and balanced/unbalanced cases
+		for n in 0..10 {
+			let mut dat: Vec<i32> = (0..n).collect();
+			make_max_heap(&mut dat);
 
-		// verify heap property, parent >= child
-		for i in 1..dat.len() {
-			let parent_idx = (i-1)/2;
-			assert!(dat[parent_idx] >= dat[i], "max heap property violated");
+			// verify heap property, parent >= child
+			for i in 1..dat.len() {
+				let parent_idx = (i-1)/2;
+				assert!(dat[parent_idx] >= dat[i], "max heap property violated");
+			}
 		}
 	}
 
-	// #[test]
-	// fn test_heap_sort() {
-	// 	let mut dat: Vec<i32> = (0..100).collect();
-	// 	fisher_yates_shuffle(&mut dat);
-	// 	heap_sort(&mut dat);
+	#[test]
+	fn test_heap_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		heap_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
 
-	// 	println!("{:?}", dat);
-
-	// 	assert!(is_sorted(&dat), "result not properly sorted");
-	// }
+		// try degenerate cases
+		for n in 0..3 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			heap_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
+	}
 }
