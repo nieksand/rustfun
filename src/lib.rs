@@ -309,7 +309,34 @@ fn is_sorted(dat: &Vec<i32>) -> bool {
 }
 
 
+#[test]
+fn test_quick_sort() {
+	let mut dat: Vec<i32> = (0..5000).collect();
+	fisher_yates_shuffle(&mut dat);
+	quick_sort(&mut dat);
+	assert!(is_sorted(&dat), "result not properly sorted");
+}
 
 #[test]
-fn it_works() {
+fn test_merge_sort() {
+	let mut dat: Vec<i32> = (0..5000).collect();
+	fisher_yates_shuffle(&mut dat);
+	merge_sort(&mut dat);
+	assert!(is_sorted(&dat), "result not properly sorted");
+}
+
+#[test]
+fn test_insertion_sort() {
+	let mut dat: Vec<i32> = (0..5000).collect();
+	fisher_yates_shuffle(&mut dat);
+	insertion_sort(&mut dat);
+	assert!(is_sorted(&dat), "result not properly sorted");
+}
+
+#[test]
+fn test_bogo_sort() {
+	let mut dat: Vec<i32> = (0..8).collect();
+	fisher_yates_shuffle(&mut dat);
+	bogo_sort(&mut dat);
+	assert!(is_sorted(&dat), "result not properly sorted");
 }
