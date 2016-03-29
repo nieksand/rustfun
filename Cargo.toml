@@ -1,0 +1,7 @@
+[package]
+name = "rustalgo"
+version = "0.0.1"
+authors = ["Niek Sanders <niek.sanders@gmail.com>"]
+
+[dependencies]
+rand = "*"
