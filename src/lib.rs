@@ -2,6 +2,7 @@
  * Completed:
  *   - Fisher-Yates Shuffle
  *   - Boyer-Moore Majority Vote
+ *   - Partition by Pivot
  *   - Quick Select
  *   - Quick Sort
  *   - Insertion Sort
@@ -489,6 +490,14 @@ mod tests {
 		fisher_yates_shuffle(&mut dat);
 		quick_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			quick_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
 	}
 
 	#[test]
@@ -504,11 +513,25 @@ mod tests {
 	}
 
 	#[test]
+	fn test_quick_select_degenerate() {
+		let mut v1: Vec<i32> = vec![42];
+		assert!(quick_select(&mut v1, 0) == 42);
+	}
+
+	#[test]
 	fn test_merge_sort() {
 		let mut dat: Vec<i32> = (0..5000).collect();
 		fisher_yates_shuffle(&mut dat);
 		merge_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			merge_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
 	}
 
 	#[test]
@@ -517,14 +540,25 @@ mod tests {
 		fisher_yates_shuffle(&mut dat);
 		insertion_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			insertion_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
 	}
 
 	#[test]
 	fn test_bogo_sort() {
-		let mut dat: Vec<i32> = (0..8).collect();
-		fisher_yates_shuffle(&mut dat);
-		bogo_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
+		// try degenerate and small cases
+		for n in 0..6 {
+			let mut dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			bogo_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
 	}
 
 	#[test]
@@ -615,7 +649,7 @@ mod tests {
 		heap_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
 
-		// try degenerate cases
+		// try degenerate and small cases
 		for n in 0..6 {
 			dat = (0..n).collect();
 			fisher_yates_shuffle(&mut dat);
