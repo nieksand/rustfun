@@ -7,13 +7,13 @@
  *   - Insertion Sort
  *   - Bogo Sort
  *   - Merge Sort
+ *   - Make Implicit Max Heap
+ *   - Heap Sort
  *
  * Todo:
- *   0) Make Heap
- *   1) Heap sort
- *   2) Radix sort
- *   3) Binary search
- *   4) Heap's Permutations
+ *   1) Radix sort
+ *   2) Binary search
+ *   3) Heap's Permutations
  *
  * Maybe:
  *   1) Jump Search
@@ -34,9 +34,11 @@ pub fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
 		return;
 	}
 
-	let mut rng = rand::thread_rng();
+	// offset to shuffled region
+	let mut j = dat.len();
 
-	let mut j = dat.len();	// offset to shuffled region
+	// randomly pick element to move to shuffled region
+	let mut rng = rand::thread_rng();
 	for _ in 0..dat.len()-2 {
 		let pick = rng.gen_range(0,j);
 		dat.swap(pick,j-1);
@@ -144,7 +146,7 @@ fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
  * the desired value to the 0th position before invoking this routine.
  */
 pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
-	assert!(max-min > 0, "partition requires pivot in 0th position");
+	assert!(max > min, "partition requires pivot in 0th position");
 
 	// bounds (min,pleft] and (pright,max) are partitioned.
 	let mut pleft = min;
@@ -370,10 +372,9 @@ fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
 	}
 }
 
-
-
-
-
+/*
+ * Heap sort.
+ */
 pub fn heap_sort(dat: &mut Vec<i32>) {
 	// nothing to do
 	if dat.len() < 2 {
@@ -475,6 +476,11 @@ mod tests {
 		let v4 = vec![];
 		let m4 = bm_majority_vote(&v4);
 		assert!(m4 == None);
+
+		// lonely majority
+		let v5 = vec![6];
+		let m5 = bm_majority_vote(&v5);
+		assert!(m5 == Some(6));
 	}
 
 	#[test]
