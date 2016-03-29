@@ -375,15 +375,21 @@ fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
 
 
 pub fn heap_sort(dat: &mut Vec<i32>) {
+	// nothing to do
+	if dat.len() < 2 {
+		return;
+	}
 
 	make_max_heap(dat);
 
 	// end of heap (exclusive) and begin sorted region (inclusive)
 	let mut heap_end = dat.len();
-
 	loop {
+		// move heap-max to sorted region
 		dat.swap(0, heap_end-1);
 		heap_end -= 1;
+
+		// re-establish heap condition
 		sift_down(dat, 0, heap_end);
 
 		if heap_end == 0 {
@@ -604,7 +610,7 @@ mod tests {
 		assert!(is_sorted(&dat), "result not properly sorted");
 
 		// try degenerate cases
-		for n in 0..3 {
+		for n in 0..6 {
 			dat = (0..n).collect();
 			fisher_yates_shuffle(&mut dat);
 			heap_sort(&mut dat);
