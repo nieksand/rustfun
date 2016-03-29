@@ -287,9 +287,7 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, lmax : usize, rmin : usize, 
 	}
 
 	// scratch back to output
-	for i in lmin..rmax {
-		dat[i] = scratch[i-lmin]
-	}
+	dat[lmin..rmax].clone_from_slice(scratch);
 }
 
 /*
