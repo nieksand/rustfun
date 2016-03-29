@@ -11,16 +11,16 @@
  *   - Insertion Sort
  *   - Bogo Sort
  *   - Binary Search
+ *   - Jump Search
  *
  * Todo:
  *   1) Radix sort
  *   2) Heap's Permutations
  *
  * Maybe:
- *   1) Jump Search
- *   2) Interpolation Search
- *   3) Variance calculation
- *   4) Approximate Counting (Morris)
+ *   1) Interpolation Search
+ *   2) Variance calculation
+ *   3) Approximate Counting (Morris)
  */
 extern crate rand;
 use rand::Rng;
@@ -399,7 +399,7 @@ pub fn bogo_sort(dat: &mut Vec<i32>) {
 }
 
 /*
- * Binary search.  Input must be sorted already.
+ * Binary search.  Input must already be sorted.
  */
 pub fn binary_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
 	if dat.len() == 0 {
@@ -430,7 +430,36 @@ pub fn binary_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
 	return None;
 }
 
+/*
+ * Jump search.  Input must already be sorted.
+ *
+ * This algorithm is just for fun since it is O(sqrt(n)) versus the O(log(n)) of
+ * binary search.  Conceivably it would be useful if you had a physical tape
+ * that you were scanning where performance was dominated by seek rather than
+ * read time.
+ */
+pub fn jump_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+	if dat.len() == 0 {
+		return None;
+	}
 
+	let jumpdist = (dat.len() as f64).sqrt() as usize;
+	let mut j = 0;
+	while j < dat.len() && dat[j] <= searchval {
+		j += jumpdist;
+	}
+
+	let i = if j >= jumpdist { j-jumpdist } else { 0 };
+	j = if j <= dat.len() { j } else { dat.len() };
+
+	for idx in i..j {
+		if dat[idx] == searchval {
+			return Some(idx);
+		}
+	}
+
+	return None;
+}
 
 /*
  * Verify if vector is sorted.
@@ -683,6 +712,31 @@ mod tests {
 
 		let r2 = binary_search(&dat, 1000);
 		assert!(r2 == None, "binary search should have missed");
+	}
+
+	#[test]
+	fn test_jump_search() {
+		// jump over arrays of different sizes
+		for n in 1..101 as usize {
+			// make sure we can hit every value inside
+			let dat: Vec<i32> = (0..n as i32).collect();
+			for i in 0..n {
+				let res = jump_search(&dat, dat[i]);
+				assert!(res == Some(i), "jump search should have hit");
+			}
+
+			// miss on purpose
+			let r1 = jump_search(&dat, -1);
+			assert!(r1 == None, "jump search should have missed");
+
+			let r2 = jump_search(&dat, 1000);
+			assert!(r2 == None, "jump search should have missed");
+		}
+
+		// degenerate case
+		let degen: Vec<i32> = vec![];
+		let dres = jump_search(&degen, 100);
+		assert!(dres == None);
 	}
 
 	#[test]
