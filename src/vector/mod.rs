@@ -23,7 +23,8 @@
  *   3) Approximate Counting (Morris)
  */
 extern crate rand;
-use rand::Rng;
+
+use self::rand::Rng;
 
 
 /*
