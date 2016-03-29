@@ -3,13 +3,13 @@
  *   - Fisher-Yates Shuffle
  *   - Boyer-Moore Majority Vote
  *   - Partition by Pivot
- *   - Quick Select
  *   - Quick Sort
- *   - Insertion Sort
- *   - Bogo Sort
- *   - Merge Sort
+ *   - Quick Select
  *   - Make Implicit Max Heap
  *   - Heap Sort
+ *   - Merge Sort
+ *   - Insertion Sort
+ *   - Bogo Sort
  *
  * Todo:
  *   1) Radix sort
@@ -103,35 +103,6 @@ pub fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
 }
 
 /*
- * Quicksort with random pivoting.
- *
- * Kept it as a pure implementation; does not switch to a non-recursive sort at
- * small partition sizes.
- */
-pub fn quick_sort(dat: &mut Vec<i32>) {
-	let max = dat.len();
-	quick_sort_int(dat, 0, max);
-}
-
-fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
-	assert!(min <= max, "qsort min extent gt max extent");
-	assert!(max <= dat.len(), "qsort max extent gt vector len");
-
-	// recursion base case
-	if max - min < 2 {
-		return;
-	}
-
-	// random pivot
-	dat.swap(min, rand::thread_rng().gen_range(min, max));
-	let pidx = partition(dat, min, max);
-
-	// sort subpartitions
-	quick_sort_int(dat, min, pidx);
-	quick_sort_int(dat, pidx+1, max);
-}
-
-/*
  * Partition orders an array around a pivot value.  This logic is key to both
  * the quicksort and quickselect algorithms.
  *
@@ -168,6 +139,35 @@ pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
 	// pivot lives at end of left partition
 	dat.swap(min,pleft);
 	pleft
+}
+
+/*
+ * Quicksort with random pivoting.
+ *
+ * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * small partition sizes.
+ */
+pub fn quick_sort(dat: &mut Vec<i32>) {
+	let max = dat.len();
+	quick_sort_int(dat, 0, max);
+}
+
+fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
+	assert!(min <= max, "qsort min extent gt max extent");
+	assert!(max <= dat.len(), "qsort max extent gt vector len");
+
+	// recursion base case
+	if max - min < 2 {
+		return;
+	}
+
+	// random pivot
+	dat.swap(min, rand::thread_rng().gen_range(min, max));
+	let pidx = partition(dat, min, max);
+
+	// sort subpartitions
+	quick_sort_int(dat, min, pidx);
+	quick_sort_int(dat, pidx+1, max);
 }
 
 /*
@@ -213,99 +213,7 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
 }
 
 /*
- * Insertion sort.  Stable and can support online sorts, but quadratic.
- * Decrementing loops are a suprising pita in Rust.
- */
-pub fn insertion_sort(dat: &mut Vec<i32>) {
-	// outer loop tracks sorted region
-	for i in 1..dat.len() {
-
-		// slide next unsorted element to correct place
-		// [1,i+1) reversed is (i+i,1] = [i,0)
-		for j in (1..i+1).rev() {
-			if dat[j] < dat[j-1] {
-				dat.swap(j,j-1);
-			} else {
-				break
-			}
-		}
-	}
-}
-
-/*
- * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
- */
-pub fn bogo_sort(dat: &mut Vec<i32>) {
-	let mut sorted = false;
-	while !sorted {
-		// randomly shuffle input
-		fisher_yates_shuffle(dat);
-
-		// check if we got a sorted set
-		sorted = is_sorted(&dat);
-	}
-}
-
-/*
- * Merge sort.  This is a top-down implementation.
- *
- * Kept it as a pure implementation; does not switch to a non-recursive sort at
- * small partition sizes.
- */
-pub fn merge_sort(dat: &mut Vec<i32>) {
-	// requires O(n) scratch space
-	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
-	let max = dat.len();
-	merge_sort_int(dat, 0, max, &mut scratch);
-}
-
-fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<i32>) {
-
-	// empty and single-element list already sorted
-	if max - min < 2 {
-		return;
-	}
-
-	// split in two and sort each chunk
-	let mid = (max+min)/2;
-	merge_sort_int(dat, min, mid, scratch);
-	merge_sort_int(dat, mid, max, scratch);
-
-	// combine sorted chunks
-	combine_chunks(dat, min, mid, max, scratch);
-}
-
-fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
-
-	scratch.clear();
-	let mut li : usize = lmin;
-	let mut ri : usize = mid;
-
-	// merge two sorted lists
-	while li < mid && ri < rmax {
-		if dat[li] < dat[ri] {
-			scratch.push(dat[li]);
-			li += 1;
-		} else {
-			scratch.push(dat[ri]);
-			ri += 1;
-		}
-	}
-
-	// drain remainder
-	for i in li..mid {
-		scratch.push(dat[i]);
-	}
-	for i in ri..rmax {
-		scratch.push(dat[i]);
-	}
-
-	// scratch back to output
-	dat[lmin..rmax].clone_from_slice(scratch);
-}
-
-/*
- * Make heap datastructure.
+ * Make implicity binary max-heap data structure.
  *
  * Indexing for implicit complete binary heap:
  *     root is at 0
@@ -316,7 +224,7 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
  * Heap property: all nodes gte than its children  (max heap)
  *
  */
-pub fn make_max_heap(dat: &mut Vec<i32>) {
+pub fn make_implicit_max_heap(dat: &mut Vec<i32>) {
 	// nothing to do
 	if dat.len() < 2 {
 		return;
@@ -382,7 +290,7 @@ pub fn heap_sort(dat: &mut Vec<i32>) {
 		return;
 	}
 
-	make_max_heap(dat);
+	make_implicit_max_heap(dat);
 
 	// end of heap (exclusive) and begin sorted region (inclusive)
 	let mut heap_end = dat.len();
@@ -400,6 +308,97 @@ pub fn heap_sort(dat: &mut Vec<i32>) {
 	}
 }
 
+/*
+ * Merge sort.  This is a top-down implementation.
+ *
+ * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * small partition sizes.
+ */
+pub fn merge_sort(dat: &mut Vec<i32>) {
+	// requires O(n) scratch space
+	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
+	let max = dat.len();
+	merge_sort_int(dat, 0, max, &mut scratch);
+}
+
+fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<i32>) {
+
+	// empty and single-element list already sorted
+	if max - min < 2 {
+		return;
+	}
+
+	// split in two and sort each chunk
+	let mid = (max+min)/2;
+	merge_sort_int(dat, min, mid, scratch);
+	merge_sort_int(dat, mid, max, scratch);
+
+	// combine sorted chunks
+	combine_chunks(dat, min, mid, max, scratch);
+}
+
+fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
+
+	scratch.clear();
+	let mut li : usize = lmin;
+	let mut ri : usize = mid;
+
+	// merge two sorted lists
+	while li < mid && ri < rmax {
+		if dat[li] < dat[ri] {
+			scratch.push(dat[li]);
+			li += 1;
+		} else {
+			scratch.push(dat[ri]);
+			ri += 1;
+		}
+	}
+
+	// drain remainder
+	for i in li..mid {
+		scratch.push(dat[i]);
+	}
+	for i in ri..rmax {
+		scratch.push(dat[i]);
+	}
+
+	// scratch back to output
+	dat[lmin..rmax].clone_from_slice(scratch);
+}
+
+/*
+ * Insertion sort.  Stable and can support online sorts, but quadratic.
+ * Decrementing loops are a suprising pita in Rust.
+ */
+pub fn insertion_sort(dat: &mut Vec<i32>) {
+	// outer loop tracks sorted region
+	for i in 1..dat.len() {
+
+		// slide next unsorted element to correct place
+		// [1,i+1) reversed is (i+i,1] = [i,0)
+		for j in (1..i+1).rev() {
+			if dat[j] < dat[j-1] {
+				dat.swap(j,j-1);
+			} else {
+				break
+			}
+		}
+	}
+}
+
+/*
+ * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
+ */
+pub fn bogo_sort(dat: &mut Vec<i32>) {
+	let mut sorted = false;
+	while !sorted {
+		// randomly shuffle input
+		fisher_yates_shuffle(dat);
+
+		// check if we got a sorted set
+		sorted = is_sorted(&dat);
+	}
+}
 
 /*
  * Verify if vector is sorted.
@@ -412,7 +411,6 @@ pub fn is_sorted(dat: &Vec<i32>) -> bool {
 	}
 	true
 }
-
 
 
 #[cfg(test)]
@@ -628,11 +626,11 @@ mod tests {
 	}
 
 	#[test]
-	fn test_make_max_heap() {
+	fn test_make_implicit_max_heap() {
 		// try degenerate and balanced/unbalanced cases
 		for n in 0..10 {
 			let mut dat: Vec<i32> = (0..n).collect();
-			make_max_heap(&mut dat);
+			make_implicit_max_heap(&mut dat);
 
 			// verify heap property, parent >= child
 			for i in 1..dat.len() {
