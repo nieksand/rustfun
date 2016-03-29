@@ -305,8 +305,8 @@ mod tests {
 
 	#[test]
 	fn test_fisher_yates_shuffle() {
+		// start with identical sequences
 		let origin: Vec<i32> = (0..120).collect();
-
 		let mut v1 = origin.clone();
 		let mut v2 = origin.clone();
 		assert!(v1 == v2, "start vectors unequal");
@@ -319,10 +319,34 @@ mod tests {
 		assert!(v2 != origin, "shuffled v2 equal still in order");
 
 		// verify all elements still there
-		quick_sort(&mut v1);	
-		quick_sort(&mut v2);	
+		quick_sort(&mut v1);
+		quick_sort(&mut v2);
 		assert!(v1 == origin, "resorted v1 missing elements");
 		assert!(v2 == origin, "resorted v2 missing elements");
+	}
+
+	#[test]
+	fn test_bm_majority_vote() {
+
+		// majority of 1s
+		let v1 = vec![0,1,0,1,1];
+		let m1 = bm_majority_vote(&v1);
+		assert!(m1 == Some(1));
+
+		// no majority
+		let v2 = vec![0,1,0,1,1,0];
+		let m2 = bm_majority_vote(&v2);
+		assert!(m2 == None);
+
+		// majority of 1s but not strict majority
+		let v3 = vec![2,2,0,1,0,1,1];
+		let m3 = bm_majority_vote(&v3);
+		assert!(m3 == None);
+
+		// empty input
+		let v4 = vec![];
+		let m4 = bm_majority_vote(&v4);
+		assert!(m4 == None);
 	}
 
 	#[test]
