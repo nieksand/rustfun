@@ -460,14 +460,4 @@ mod tests {
 		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
 		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
 	}
-
-
-	#[test]
-	#[ignore]
-	fn test_merge_crazy() {
-		let mut dat: Vec<i32> = (0..100000000).collect();
-		fisher_yates_shuffle(&mut dat);
-		merge_sort(&mut dat);
-	}
-	
 }
