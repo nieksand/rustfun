@@ -461,6 +461,52 @@ pub fn jump_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
 	return None;
 }
 
+
+
+/*
+ * incomplete - hyperghetto stub of interpolation search.
+ */
+pub fn interpolation_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+	if dat.len() == 0 {
+		return None;
+	}
+
+	// searchval, if it exists, is always in [min,max)
+	let mut min = 0;
+	let mut max = dat.len();
+	while min < max {
+
+		let x1 = min as f64;
+		let x2 = (max-1) as f64;
+		let y1 = dat[min] as f64;
+		let y2 = dat[max-1] as f64;
+		let m = (y1-y2)/(x1-x2);
+		let b = y1 - m * x1;
+
+		let mut xn = ((searchval as f64 - b) / m) as usize;
+		xn = if xn < min { min } else { xn };
+		xn = if xn >= max { max-1 } else { xn };
+
+		// excluded [xn, max) so search [min,xn)
+		if dat[xn] > searchval {
+			max = xn;
+		}
+		// excluded [min,xn] so search [xn+1,max)
+		else if dat[xn] < searchval {
+			min = xn+1;
+		}
+		// direct hit
+		else {
+			return Some(xn);
+		}
+	}
+
+	// [min,max) now empty range, value can not exist
+	return None;
+}
+
+
+
 /*
  * Verify if vector is sorted.
  */
@@ -737,6 +783,21 @@ mod tests {
 		let degen: Vec<i32> = vec![];
 		let dres = jump_search(&degen, 100);
 		assert!(dres == None);
+	}
+
+	#[test]
+	fn test_interpolation_search() {
+		let dat: Vec<i32> = (0..10).collect();
+		for i in 0..dat.len() {
+			let res = interpolation_search(&dat, dat[i]);
+			assert!(res == Some(i), "interpolation search should have hit");
+		}
+
+		let r1 = interpolation_search(&dat, -1);
+		assert!(r1 == None, "interpolation search should have missed");
+
+		let r2 = interpolation_search(&dat, 1000);
+		assert!(r2 == None, "interpolation search should have missed");
 	}
 
 	#[test]
