@@ -1,6 +1,7 @@
 # Rust Algorithms
 
 ## Vector Algorithms (vector)
+Common algorithms for working with vectors.
 
 Completed
   * Fisher-Yates Shuffle
@@ -27,3 +28,8 @@ Maybe
 
 
 ## Binary Search Trees (bst)
+BST implementation.
+
+Todo
+  * Basic BST
+  * RB Tree
