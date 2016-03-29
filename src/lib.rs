@@ -6,12 +6,12 @@
  *   - Quick Sort
  *   - Insertion Sort
  *   - Bogo Sort
+ *   - Merge Sort
  *
  * Todo:
- *   1) Merge sort	- scratch implementation exists
- *   2) Heap sort
- *   3) Radix sort
- *   4) Binary search
+ *   1) Heap sort
+ *   2) Radix sort
+ *   3) Binary search
  */
 extern crate rand;
 use rand::Rng;
@@ -87,8 +87,10 @@ pub fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
 }
 
 /*
- * Quicksort with random pivoting.  Kept it as a pure implementation; does not
- * switch to a non-recursive sort at small partition sizes.
+ * Quicksort with random pivoting.
+ *
+ * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * small partition sizes.
  */
 pub fn quick_sort(dat: &mut Vec<i32>) {
 	let max = dat.len();
@@ -229,12 +231,14 @@ pub fn bogo_sort(dat: &mut Vec<i32>) {
 }
 
 /*
- * [incomplete] Merge sort implementation.
+ * Merge sort.  This is a top-down implementation.
+ *
+ * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * small partition sizes.
  */
 pub fn merge_sort(dat: &mut Vec<i32>) {
-
+	// requires O(n) scratch space
 	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
-
 	let max = dat.len();
 	merge_sort_int(dat, 0, max, &mut scratch);
 }
@@ -458,4 +462,14 @@ mod tests {
 		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
 		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
 	}
+
+
+	#[test]
+	#[ignore]
+	fn test_merge_crazy() {
+		let mut dat: Vec<i32> = (0..100000000).collect();
+		fisher_yates_shuffle(&mut dat);
+		merge_sort(&mut dat);
+	}
+	
 }
