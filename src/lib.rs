@@ -256,19 +256,17 @@ fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<
 	merge_sort_int(dat, mid, max, scratch);
 
 	// combine sorted chunks
-	combine_chunks(dat, min, mid, mid, max, scratch);
+	combine_chunks(dat, min, mid, max, scratch);
 }
 
-fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, lmax : usize, rmin : usize, rmax : usize, scratch: &mut Vec<i32>) {
-
-	assert!(lmax == rmin, "mergesort combine chunks must be adjacent");
+fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
 
 	scratch.clear();
 	let mut li : usize = lmin;
-	let mut ri : usize = lmax;
+	let mut ri : usize = mid;
 
 	// merge two sorted lists
-	while li < lmax && ri < rmax {
+	while li < mid && ri < rmax {
 		if dat[li] < dat[ri] {
 			scratch.push(dat[li]);
 			li += 1;
@@ -279,7 +277,7 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, lmax : usize, rmin : usize, 
 	}
 
 	// drain remainder
-	for i in li..lmax {
+	for i in li..mid {
 		scratch.push(dat[i]);
 	}
 	for i in ri..rmax {
