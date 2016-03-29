@@ -213,15 +213,13 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
 }
 
 /*
- * Make implicity binary max-heap data structure.
+ * Make implicit binary max-heap data structure.
  *
- * Indexing for implicit complete binary heap:
+ * Uses following packing scheme to map heap elements to array:
  *     root is at 0
  *     parent(i)     = floor( (i-1)/2 )
  *     leftchild(i)  = 2*i+1
  *     rightchild(i) = 2*i+2
- *
- * Heap property: all nodes gte than its children  (max heap)
  *
  */
 pub fn make_implicit_max_heap(dat: &mut Vec<i32>) {
