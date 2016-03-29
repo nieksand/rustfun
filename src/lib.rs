@@ -9,9 +9,17 @@
  *   - Merge Sort
  *
  * Todo:
+ *   0) Make Heap
  *   1) Heap sort
  *   2) Radix sort
  *   3) Binary search
+ *   4) Heap's Permutations
+ *
+ * Maybe:
+ *   1) Jump Search
+ *   2) Interpolation Search
+ *   3) Variance calculation
+ *   4) Approximate Counting (Morris)
  */
 extern crate rand;
 use rand::Rng;
@@ -289,6 +297,103 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
 }
 
 /*
+ * Make heap datastructure.
+ *
+ * Indexing for implicit complete binary heap:
+ *     root is at 0
+ *     parent(i)     = floor( (i-1)/2 )
+ *     leftchild(i)  = 2*i+1
+ *     rightchild(i) = 2*i+2
+ *
+ * Heap property: all nodes gte than its children  (max heap)
+ *
+ */
+pub fn make_max_heap(dat: &mut Vec<i32>) {
+	// nothing to do
+	if dat.len() <= 1 {
+		return;
+	}
+
+	// start by establish heap property on far-right subtree
+	fn parent_idx(node_idx: usize) -> usize {
+		return (node_idx-1)/2;
+	}
+	let end = dat.len();
+	let mut root_idx = parent_idx(end-1);
+
+
+	// toss in new element to root, sift-down to proper home
+	loop {
+		sift_down(dat, root_idx, end);
+		root_idx -= 1;
+
+		if root_idx == 0 {
+			break;
+		}
+	}
+}
+
+fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
+	fn left_child_idx(node_idx: usize) -> usize {
+		return 2*node_idx+1;
+	}
+
+	// element may violate heap property; rest of array must be valid
+	let mut wiggle_idx = start;
+
+	// swap wiggle element downwards with largest child until heap property
+	// re-established
+	while left_child_idx(wiggle_idx) < end {
+
+		let mut swap_target = wiggle_idx;
+
+		let left_idx = left_child_idx(wiggle_idx);
+		let right_idx = left_idx + 1;
+
+		// loop condition ensures child exists
+		if dat[left_idx] > dat[wiggle_idx] {
+			swap_target = left_idx;
+		}
+
+		// right child greater than wiggle and left child
+		if right_idx < end && dat[right_idx] > dat[swap_target] {
+			swap_target = right_idx;
+		}
+
+		// heap property was established!
+		if swap_target == wiggle_idx {
+			return;
+		}
+
+		dat.swap(wiggle_idx, swap_target);
+		wiggle_idx = swap_target;
+	}
+}
+
+
+
+
+
+pub fn heap_sort(dat: &mut Vec<i32>) {
+
+	make_max_heap(dat);
+
+	// end of heap (exclusive) and begin sorted region (inclusive)
+	let mut heap_end = dat.len();
+
+	loop {
+		dat.swap(0, heap_end-1);
+		heap_end -= 1;
+		sift_down(dat, 0, heap_end);
+
+		if heap_end == 0 {
+			break;
+		}
+	}
+}
+
+
+/*
  * Verify if vector is sorted.
  */
 pub fn is_sorted(dat: &Vec<i32>) -> bool {
@@ -299,6 +404,8 @@ pub fn is_sorted(dat: &Vec<i32>) -> bool {
 	}
 	true
 }
+
+
 
 #[cfg(test)]
 mod tests {
@@ -458,4 +565,27 @@ mod tests {
 		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
 		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
 	}
+
+	#[test]
+	fn test_make_max_heap() {
+		let mut dat: Vec<i32> = (0..3).collect();
+		make_max_heap(&mut dat);
+
+		// verify heap property, parent >= child
+		for i in 1..dat.len() {
+			let parent_idx = (i-1)/2;
+			assert!(dat[parent_idx] >= dat[i], "max heap property violated");
+		}
+	}
+
+	// #[test]
+	// fn test_heap_sort() {
+	// 	let mut dat: Vec<i32> = (0..100).collect();
+	// 	fisher_yates_shuffle(&mut dat);
+	// 	heap_sort(&mut dat);
+
+	// 	println!("{:?}", dat);
+
+	// 	assert!(is_sorted(&dat), "result not properly sorted");
+	// }
 }
