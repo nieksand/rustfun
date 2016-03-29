@@ -483,6 +483,54 @@ mod tests {
 	}
 
 	#[test]
+	fn test_partition() {
+		fn left_ok(dat: &Vec<i32>, bound: i32, min: usize, max: usize) -> bool {
+			for i in min..max {
+				if dat[i] > bound {
+					return false;
+				}
+			}
+			true
+		}
+		fn right_ok(dat: &Vec<i32>, bound: i32, min: usize, max: usize) -> bool {
+			for i in min..max {
+				if dat[i] <= bound {
+					return false;
+				}
+			}
+			true
+		}
+
+		// empty right partition
+		let mut v1 = vec![1, 0, 0, 0];
+		let p1 = partition(&mut v1, 0, 4);
+		assert!(p1 == 3, "pivot not in right final location");
+		assert!(left_ok(&v1, 1, 0, p1), "left partition invalid");
+		assert!(right_ok(&v1, 1, p1+1, 4), "right partition invalid");
+
+		// empty left partition
+		let mut v2 = vec![0, 1, 1, 1];
+		let p2 = partition(&mut v2, 0, 4);
+		assert!(p2 == 0, "pivot not in right final location");
+		assert!(left_ok(&v2, 0, 0, p2), "left partition invalid");
+		assert!(right_ok(&v2, 0, p2+1, 4), "right partition invalid");
+
+		// partition on each side
+		let mut v3 = vec![3, 5, 0, 1, 2, 4];
+		let p3 = partition(&mut v3, 0, 6);
+		assert!(p3 == 3, "pivot not in right final location");
+		assert!(left_ok(&v3, 3, 0, p3), "left partition invalid");
+		assert!(right_ok(&v3, 3, p3+1, 6), "right partition invalid");
+
+		// both partitions empty
+		let mut v4 = vec![42];
+		let p4 = partition(&mut v4, 0, 1);
+		assert!(p4 == 0, "pivot not in right final location");
+		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
+		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
+	}
+
+	#[test]
 	fn test_quick_sort() {
 		let mut dat: Vec<i32> = (0..5000).collect();
 		fisher_yates_shuffle(&mut dat);
@@ -514,6 +562,37 @@ mod tests {
 	fn test_quick_select_degenerate() {
 		let mut v1: Vec<i32> = vec![42];
 		assert!(quick_select(&mut v1, 0) == 42);
+	}
+
+	#[test]
+	fn test_make_implicit_max_heap() {
+		// try degenerate and balanced/unbalanced cases
+		for n in 0..10 {
+			let mut dat: Vec<i32> = (0..n).collect();
+			make_implicit_max_heap(&mut dat);
+
+			// verify heap property, parent >= child
+			for i in 1..dat.len() {
+				let parent_idx = (i-1)/2;
+				assert!(dat[parent_idx] >= dat[i], "max heap property violated");
+			}
+		}
+	}
+
+	#[test]
+	fn test_heap_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		heap_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			heap_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
 	}
 
 	#[test]
@@ -575,84 +654,5 @@ mod tests {
 
 		let v5 = vec![5, 3, 8];
 		assert!(!is_sorted(&v5), "accepted unsorted sequence");
-	}
-
-	#[test]
-	fn test_partition() {
-		fn left_ok(dat: &Vec<i32>, bound: i32, min: usize, max: usize) -> bool {
-			for i in min..max {
-				if dat[i] > bound {
-					return false;
-				}
-			}
-			true
-		}
-		fn right_ok(dat: &Vec<i32>, bound: i32, min: usize, max: usize) -> bool {
-			for i in min..max {
-				if dat[i] <= bound {
-					return false;
-				}
-			}
-			true
-		}
-
-		// empty right partition
-		let mut v1 = vec![1, 0, 0, 0];
-		let p1 = partition(&mut v1, 0, 4);
-		assert!(p1 == 3, "pivot not in right final location");
-		assert!(left_ok(&v1, 1, 0, p1), "left partition invalid");
-		assert!(right_ok(&v1, 1, p1+1, 4), "right partition invalid");
-
-		// empty left partition
-		let mut v2 = vec![0, 1, 1, 1];
-		let p2 = partition(&mut v2, 0, 4);
-		assert!(p2 == 0, "pivot not in right final location");
-		assert!(left_ok(&v2, 0, 0, p2), "left partition invalid");
-		assert!(right_ok(&v2, 0, p2+1, 4), "right partition invalid");
-
-		// partition on each side
-		let mut v3 = vec![3, 5, 0, 1, 2, 4];
-		let p3 = partition(&mut v3, 0, 6);
-		assert!(p3 == 3, "pivot not in right final location");
-		assert!(left_ok(&v3, 3, 0, p3), "left partition invalid");
-		assert!(right_ok(&v3, 3, p3+1, 6), "right partition invalid");
-
-		// both partitions empty
-		let mut v4 = vec![42];
-		let p4 = partition(&mut v4, 0, 1);
-		assert!(p4 == 0, "pivot not in right final location");
-		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
-		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
-	}
-
-	#[test]
-	fn test_make_implicit_max_heap() {
-		// try degenerate and balanced/unbalanced cases
-		for n in 0..10 {
-			let mut dat: Vec<i32> = (0..n).collect();
-			make_implicit_max_heap(&mut dat);
-
-			// verify heap property, parent >= child
-			for i in 1..dat.len() {
-				let parent_idx = (i-1)/2;
-				assert!(dat[parent_idx] >= dat[i], "max heap property violated");
-			}
-		}
-	}
-
-	#[test]
-	fn test_heap_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		heap_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			heap_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
 	}
 }
