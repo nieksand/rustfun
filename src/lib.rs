@@ -304,6 +304,28 @@ mod tests {
     use super::*;
 
 	#[test]
+	fn test_fisher_yates_shuffle() {
+		let origin: Vec<i32> = (0..120).collect();
+
+		let mut v1 = origin.clone();
+		let mut v2 = origin.clone();
+		assert!(v1 == v2, "start vectors unequal");
+
+		// 120! permutations so odds of chance collision infinitesimal
+		fisher_yates_shuffle(&mut v1);
+		fisher_yates_shuffle(&mut v2);
+		assert!(v1 != v2, "shuffled vectors equal");
+		assert!(v1 != origin, "shuffled v1 equal still in order");
+		assert!(v2 != origin, "shuffled v2 equal still in order");
+
+		// verify all elements still there
+		quick_sort(&mut v1);	
+		quick_sort(&mut v2);	
+		assert!(v1 == origin, "resorted v1 missing elements");
+		assert!(v2 == origin, "resorted v2 missing elements");
+	}
+
+	#[test]
 	fn test_quick_sort() {
 		let mut dat: Vec<i32> = (0..5000).collect();
 		fisher_yates_shuffle(&mut dat);
