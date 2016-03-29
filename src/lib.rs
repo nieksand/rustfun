@@ -19,7 +19,7 @@ use rand::Rng;
 /*
  * Randomly shuffle vector using Durstenfeld's variant of Fisher-Yates.
  */
-fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
+pub fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
 	let mut rng = rand::thread_rng();
 
 	let mut j = dat.len();	// offset to shuffled region
@@ -48,7 +48,7 @@ fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
  * Series, Kluwer Academic Publishers, Dordrecht, The Netherlands, 1991, pp.
  * 105-117.
  */
-fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
+pub fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
 	// no majority on empty set
 	if dat.len() == 0 {
 		return None;
@@ -89,7 +89,7 @@ fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
  * Quicksort with random pivoting.  Kept it as a pure implementation; does not
  * switch to a non-recursive sort at small partition sizes.
  */
-fn quick_sort(dat: &mut Vec<i32>) {
+pub fn quick_sort(dat: &mut Vec<i32>) {
 	let max = dat.len();
 	quick_sort_int(dat, 0, max);
 }
@@ -127,7 +127,7 @@ fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
  * Note that you can control the pivot (e.g. choose one randomly) by swapping
  * the desired value to the 0th position before invoking this routine.
  */
-fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
+pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
 	assert!(max-min > 0, "partition requires pivot in 0th position");
 
 	// bounds (min,pleft] and (pright,max) are partitioned.
@@ -162,8 +162,8 @@ fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
  * where the kth element falls relative to the pivot and only recurse on that
  * side.  You stop once the pivot=kth element.
  */
-fn quick_select(dat: &mut Vec<i32>, k: usize) -> i32 {
-	assert!(k >= 0 && k < dat.len(), "k-th element not in data bounds");
+pub fn quick_select(dat: &mut Vec<i32>, k: usize) -> i32 {
+	assert!(k < dat.len(), "k-th element not in data bounds");
 
 	let max = dat.len();
 	quick_select_int(dat, 0, max, k);
@@ -197,7 +197,7 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
  * Insertion sort.  Stable and can support online sorts, but quadratic.
  * Decrementing loops are a suprising pita in Rust.
  */
-fn insertion_sort(dat: &mut Vec<i32>) {
+pub fn insertion_sort(dat: &mut Vec<i32>) {
 	// outer loop tracks sorted region
 	for i in 1..dat.len() {
 
@@ -216,7 +216,7 @@ fn insertion_sort(dat: &mut Vec<i32>) {
 /*
  * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
  */
-fn bogo_sort(dat: &mut Vec<i32>) {
+pub fn bogo_sort(dat: &mut Vec<i32>) {
 	let mut sorted = false;
 	while !sorted {
 		// randomly shuffle input
@@ -230,7 +230,7 @@ fn bogo_sort(dat: &mut Vec<i32>) {
 /*
  * [incomplete] Merge sort implementation.
  */
-fn merge_sort(dat: &mut Vec<i32>) {
+pub fn merge_sort(dat: &mut Vec<i32>) {
 
 	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
 
@@ -290,7 +290,7 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, lmax : usize, rmin : usize, 
 /*
  * Verify if vector is sorted.
  */
-fn is_sorted(dat: &Vec<i32>) -> bool {
+pub fn is_sorted(dat: &Vec<i32>) -> bool {
 	for i in 1..dat.len() {
 		if dat[i] < dat[i-1] {
 			return false;
@@ -299,53 +299,57 @@ fn is_sorted(dat: &Vec<i32>) -> bool {
 	true
 }
 
+#[cfg(test)]
+mod tests {
+    use super::*;
 
-#[test]
-fn test_quick_sort() {
-	let mut dat: Vec<i32> = (0..5000).collect();
-	fisher_yates_shuffle(&mut dat);
-	quick_sort(&mut dat);
-	assert!(is_sorted(&dat), "result not properly sorted");
-}
-
-#[test]
-fn test_merge_sort() {
-	let mut dat: Vec<i32> = (0..5000).collect();
-	fisher_yates_shuffle(&mut dat);
-	merge_sort(&mut dat);
-	assert!(is_sorted(&dat), "result not properly sorted");
-}
-
-#[test]
-fn test_insertion_sort() {
-	let mut dat: Vec<i32> = (0..5000).collect();
-	fisher_yates_shuffle(&mut dat);
-	insertion_sort(&mut dat);
-	assert!(is_sorted(&dat), "result not properly sorted");
-}
-
-#[test]
-fn test_bogo_sort() {
-	let mut dat: Vec<i32> = (0..8).collect();
-	fisher_yates_shuffle(&mut dat);
-	bogo_sort(&mut dat);
-	assert!(is_sorted(&dat), "result not properly sorted");
-}
-
-#[test]
-fn test_is_sorted() {
-	let v1 = vec![];
-	assert!(is_sorted(&v1), "empty array always sorted");
-
-	let v2 = vec![3];
-	assert!(is_sorted(&v2), "single element array always sorted");
-
-	let v3 = vec![-1, 0, 5];
-	assert!(is_sorted(&v3), "rejected a sorted sequence");
-
-	let v4 = vec![0, 0, 0];
-	assert!(is_sorted(&v4), "rejected all-same sequence");
-
-	let v5 = vec![5, 3, 8];
-	assert!(!is_sorted(&v5), "accepted unsorted sequence");
+	#[test]
+	fn test_quick_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		quick_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+	}
+	
+	#[test]
+	fn test_merge_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		merge_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+	}
+	
+	#[test]
+	fn test_insertion_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		insertion_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+	}
+	
+	#[test]
+	fn test_bogo_sort() {
+		let mut dat: Vec<i32> = (0..8).collect();
+		fisher_yates_shuffle(&mut dat);
+		bogo_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+	}
+	
+	#[test]
+	fn test_is_sorted() {
+		let v1 = vec![];
+		assert!(is_sorted(&v1), "empty array always sorted");
+	
+		let v2 = vec![3];
+		assert!(is_sorted(&v2), "single element array always sorted");
+	
+		let v3 = vec![-1, 0, 5];
+		assert!(is_sorted(&v3), "rejected a sorted sequence");
+	
+		let v4 = vec![0, 0, 0];
+		assert!(is_sorted(&v4), "rejected all-same sequence");
+	
+		let v5 = vec![5, 3, 8];
+		assert!(!is_sorted(&v5), "accepted unsorted sequence");
+	}
 }
