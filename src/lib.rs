@@ -5,16 +5,16 @@
  *   - Partition by Pivot
  *   - Quick Sort
  *   - Quick Select
- *   - Make Implicit Max Heap
+ *   - Implicit Max Heap
  *   - Heap Sort
  *   - Merge Sort
  *   - Insertion Sort
  *   - Bogo Sort
+ *   - Binary Search
  *
  * Todo:
  *   1) Radix sort
- *   2) Binary search
- *   3) Heap's Permutations
+ *   2) Heap's Permutations
  *
  * Maybe:
  *   1) Jump Search
@@ -399,6 +399,40 @@ pub fn bogo_sort(dat: &mut Vec<i32>) {
 }
 
 /*
+ * Binary search.  Input must be sorted already.
+ */
+pub fn binary_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+	if dat.len() == 0 {
+		return None;
+	}
+
+	// searchval, if it exists, is always in [min,max)
+	let mut min = 0;
+	let mut max = dat.len();
+	while min < max {
+		let mid = (max+min)/2;
+
+		// excluded [mid, max) so search [min,mid)
+		if dat[mid] > searchval {
+			max = mid;
+		}
+		// excluded [min,mid] so search [mid+1,max)
+		else if dat[mid] < searchval {
+			min = mid+1;
+		}
+		// direct hit
+		else {
+			return Some(mid);
+		}
+	}
+
+	// [min,max) now empty range, value can not exist
+	return None;
+}
+
+
+
+/*
  * Verify if vector is sorted.
  */
 pub fn is_sorted(dat: &Vec<i32>) -> bool {
@@ -634,6 +668,21 @@ mod tests {
 			bogo_sort(&mut dat);
 			assert!(is_sorted(&dat), "result not properly sorted");
 		}
+	}
+
+	#[test]
+	fn test_binary_search() {
+		let dat: Vec<i32> = (0..10).collect();
+		for i in 0..dat.len() {
+			let res = binary_search(&dat, dat[i]);
+			assert!(res == Some(i), "binary search should have hit");
+		}
+
+		let r1 = binary_search(&dat, -1);
+		assert!(r1 == None, "binary search should have missed");
+
+		let r2 = binary_search(&dat, 1000);
+		assert!(r2 == None, "binary search should have missed");
 	}
 
 	#[test]
