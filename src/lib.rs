@@ -11,6 +11,7 @@
  *   1) Merge sort	- scratch implementation exists
  *   2) Heap sort
  *   3) Radix sort
+ *   4) Binary search
  */
 extern crate rand;
 use rand::Rng;
@@ -327,7 +328,6 @@ mod tests {
 
 	#[test]
 	fn test_bm_majority_vote() {
-
 		// majority of 1s
 		let v1 = vec![0,1,0,1,1];
 		let m1 = bm_majority_vote(&v1);
@@ -355,6 +355,18 @@ mod tests {
 		fisher_yates_shuffle(&mut dat);
 		quick_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
+	}
+
+	#[test]
+	fn test_quick_select() {
+		let mut dat: Vec<i32> = (0..100).collect();
+		fisher_yates_shuffle(&mut dat);
+
+		let k10 = quick_select(&mut dat, 10);
+		assert!(k10 == 10, "qselect did not pick 10th element");
+
+		let k99 = quick_select(&mut dat, 99);
+		assert!(k99 == 99, "qselect did not pick 99th element");
 	}
 
 	#[test]
