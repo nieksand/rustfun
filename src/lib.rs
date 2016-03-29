@@ -227,7 +227,9 @@ fn bogo_sort(dat: &mut Vec<i32>) {
 	}
 }
 
-
+/*
+ * [incomplete] Merge sort implementation.
+ */
 fn merge_sort(dat: &mut Vec<i32>) {
 
 	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
@@ -285,17 +287,6 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, lmax : usize, rmin : usize, 
 	}
 }
 
-
-/*
- * Pretty-print a vector
- */
-fn print_vec(dat: &Vec<i32>) {
-	for v in dat {
-		print!("{} ", v);
-	}
-	print!("\n");
-}
-
 /*
  * Verify if vector is sorted.
  */
@@ -339,4 +330,22 @@ fn test_bogo_sort() {
 	fisher_yates_shuffle(&mut dat);
 	bogo_sort(&mut dat);
 	assert!(is_sorted(&dat), "result not properly sorted");
+}
+
+#[test]
+fn test_is_sorted() {
+	let v1 = vec![];
+	assert!(is_sorted(&v1), "empty array always sorted");
+
+	let v2 = vec![3];
+	assert!(is_sorted(&v2), "single element array always sorted");
+
+	let v3 = vec![-1, 0, 5];
+	assert!(is_sorted(&v3), "rejected a sorted sequence");
+
+	let v4 = vec![0, 0, 0];
+	assert!(is_sorted(&v4), "rejected all-same sequence");
+
+	let v5 = vec![5, 3, 8];
+	assert!(!is_sorted(&v5), "accepted unsorted sequence");
 }
