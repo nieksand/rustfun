@@ -33,3 +33,9 @@ BST implementation.
 Todo
   * Basic BST
   * RB Tree
+
+
+## Singly Linked List (slist)
+
+## Doubly Linked List (dlist)
+
