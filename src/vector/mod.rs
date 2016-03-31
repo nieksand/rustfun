@@ -291,19 +291,13 @@ pub fn heap_sort(dat: &mut Vec<i32>) {
 
 	make_implicit_max_heap(dat);
 
-	// end of heap (exclusive) and begin sorted region (inclusive)
-	let mut heap_end = dat.len();
-	loop {
-		// move heap-max to sorted region
-		dat.swap(0, heap_end-1);
-		heap_end -= 1;
-
-		// re-establish heap condition
-		sift_down(dat, 0, heap_end);
-
-		if heap_end == 0 {
-			break;
-		}
+	// swap top of heap (max val) to sorted region being built at end
+	// reestablish heap property by shifting down the element we swapped
+	// inwards.
+	let len = dat.len();
+	for i in 0..len {
+		dat.swap(0, len-i-1);
+		sift_down(dat, 0, len-i-1);
 	}
 }
 
