@@ -12,6 +12,7 @@
  *   - Bogo Sort
  *   - Binary Search
  *   - Jump Search
+ *   - Reverse Sequence
  *
  * Todo:
  *   1) Radix sort
@@ -523,6 +524,18 @@ pub fn is_sorted(dat: &Vec<i32>) -> bool {
 	true
 }
 
+/*
+ * Reverse order of elements in vector.
+ *
+ * Rust has a built-in for this; this implementation is just for fun.
+ */
+pub fn reverse(dat: &mut Vec<i32>) {
+	let len = dat.len();
+	for i in 0..len/2 {
+		dat.swap(i,len-i-1);
+	}
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -823,10 +836,38 @@ mod tests {
 	}
 
 	#[test]
+	fn test_reverse() {
+		let mut v1: Vec<i32> = vec![];
+		reverse(&mut v1);
+		assert!(v1 == vec![], "identity for reversed empty vector");
+
+		let mut v2: Vec<i32> = vec![6];
+		reverse(&mut v2);
+		assert!(v2 == vec![6], "identity for reversed one element vector");
+
+		let mut v3: Vec<i32> = vec![1,2,3,4];
+		reverse(&mut v3);
+		assert!(v3 == vec![4,3,2,1], "reversed even-count vector");
+
+		let mut v4: Vec<i32> = vec![1,2,3,4,5];
+		reverse(&mut v4);
+		assert!(v4 == vec![5,4,3,2,1], "reversed odd-count vector");
+
+		let mut v5: Vec<i32> = (0..10000).collect();
+		fisher_yates_shuffle(&mut v5);
+		let v5_orig = v5.clone();
+		reverse(&mut v5);
+		reverse(&mut v5);
+		assert!(v5 == v5_orig, "double reverse should equal start");
+	}
+
+/*
+	#[test]
 	fn test_meowmix() {
 		let mut dat: Vec<i32> = (0..30000000).collect();
 		fisher_yates_shuffle(&mut dat);
 		merge_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
 	}
+*/
 }
