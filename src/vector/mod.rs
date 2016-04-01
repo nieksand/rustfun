@@ -360,21 +360,31 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
 }
 
 /*
- * Insertion sort.  Stable and can support online sorts, but quadratic.
- * Decrementing loops are a suprising pita in Rust.
+ * Insertion sort.  Stable and can be made online, but quadratic.
  */
 pub fn insertion_sort(dat: &mut Vec<i32>) {
-	// outer loop tracks sorted region
+	// nothing to do
+	if dat.len() < 2 {
+		return;
+	}
+
+	// place smallest value at 0th index as sentinel
+	let mut sidx = 0;
 	for i in 1..dat.len() {
+		if dat[i] < dat[sidx] {
+			sidx = i;
+		}
+	}
+	dat.swap(0, sidx);
+
+	// outer loop tracks sorted region
+	for i in 2..dat.len() {
 
 		// slide next unsorted element to correct place
-		// [1,i+1) reversed is (i+i,1] = [i,0)
-		for j in (1..i+1).rev() {
-			if dat[j] < dat[j-1] {
-				dat.swap(j,j-1);
-			} else {
-				break
-			}
+		let mut j = i;
+		while dat[j] < dat[j-1] {
+			dat.swap(j,j-1);
+			j -= 1;
 		}
 	}
 }
@@ -811,5 +821,14 @@ mod tests {
 
 		let v5 = vec![5, 3, 8];
 		assert!(!is_sorted(&v5), "accepted unsorted sequence");
+	}
+
+	#[test]
+	#[ignore]
+	fn test_meowmix() {
+		let mut dat: Vec<i32> = (0..200000).collect();
+		fisher_yates_shuffle(&mut dat);
+		insertion_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
 	}
 }
