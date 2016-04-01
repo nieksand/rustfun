@@ -348,11 +348,10 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
 	}
 
 	// drain remainder
-	for i in li..mid {
-		scratch.push(dat[i]);
-	}
-	for i in ri..rmax {
-		scratch.push(dat[i]);
+	if li < mid {
+		scratch.extend_from_slice(&dat[li..mid]);
+	} else if ri < rmax {
+		scratch.extend_from_slice(&dat[ri..rmax]);
 	}
 
 	// scratch back to output
@@ -824,11 +823,10 @@ mod tests {
 	}
 
 	#[test]
-	#[ignore]
 	fn test_meowmix() {
-		let mut dat: Vec<i32> = (0..200000).collect();
+		let mut dat: Vec<i32> = (0..30000000).collect();
 		fisher_yates_shuffle(&mut dat);
-		insertion_sort(&mut dat);
+		merge_sort(&mut dat);
 		assert!(is_sorted(&dat), "result not properly sorted");
 	}
 }
