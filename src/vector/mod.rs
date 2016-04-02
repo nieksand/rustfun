@@ -31,7 +31,7 @@ use self::rand::Rng;
 /*
  * Randomly shuffle vector using Durstenfeld's variant of Fisher-Yates.
  */
-pub fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
+pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 	// nothing to do
 	if dat.len() < 2 {
 		return;
@@ -67,7 +67,7 @@ pub fn fisher_yates_shuffle(dat: &mut Vec<i32>) {
  * Series, Kluwer Academic Publishers, Dordrecht, The Netherlands, 1991, pp.
  * 105-117.
  */
-pub fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
+pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
 	// no majority on empty set
 	if dat.len() == 0 {
 		return None;
@@ -114,21 +114,21 @@ pub fn bm_majority_vote(dat: &Vec<i32>) -> Option<i32> {
  * The output has the array partitioned:
  *   [values <= pivot, pivot, values > pivot]
  *
- * It returns the final index of the pivot.
+ * It returns the final index of the pivot relative to the slice origin.
  *
  * Note that you can control the pivot (e.g. choose one randomly) by swapping
  * the desired value to the 0th position before invoking this routine.
  */
-pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
-	assert!(max > min, "partition requires pivot in 0th position");
+pub fn partition(dat: &mut [i32]) -> usize {
+	assert!(dat.len() > 0, "partition requires pivot in 0th position");
 
 	// bounds (min,pleft] and (pright,max) are partitioned.
-	let mut pleft = min;
-	let mut pright = max;
+	let mut pleft = 0;
+	let mut pright = dat.len();
 
 	while pleft+1 < pright {
 		// value already in correct partition
-		if dat[pleft+1] <= dat[min] {
+		if dat[pleft+1] <= dat[0] {
 			pleft += 1;
 		}
 		// value belongs in other partition
@@ -139,7 +139,7 @@ pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
 	}
 
 	// pivot lives at end of left partition
-	dat.swap(min,pleft);
+	dat.swap(0,pleft);
 	pleft
 }
 
@@ -149,12 +149,12 @@ pub fn partition(dat: &mut Vec<i32>, min: usize, max: usize) -> usize {
  * Kept it as a pure implementation; does not switch to a non-recursive sort at
  * small partition sizes.
  */
-pub fn quick_sort(dat: &mut Vec<i32>) {
+pub fn quick_sort(dat: &mut [i32]) {
 	let max = dat.len();
 	quick_sort_int(dat, 0, max);
 }
 
-fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
+fn quick_sort_int(dat: &mut [i32], min: usize, max: usize) {
 	assert!(min <= max, "qsort min extent gt max extent");
 	assert!(max <= dat.len(), "qsort max extent gt vector len");
 
@@ -165,7 +165,7 @@ fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
 
 	// random pivot
 	dat.swap(min, rand::thread_rng().gen_range(min, max));
-	let pidx = partition(dat, min, max);
+	let pidx = partition(&mut dat[min..max]) + min;
 
 	// sort subpartitions
 	quick_sort_int(dat, min, pidx);
@@ -183,7 +183,7 @@ fn quick_sort_int(dat: &mut Vec<i32>, min: usize, max: usize) {
  * where the kth element falls relative to the pivot and only recurse on that
  * side.  You stop once the pivot=kth element.
  */
-pub fn quick_select(dat: &mut Vec<i32>, k: usize) -> i32 {
+pub fn quick_select(dat: &mut [i32], k: usize) -> i32 {
 	assert!(k < dat.len(), "k-th element not in data bounds");
 
 	let max = dat.len();
@@ -191,7 +191,7 @@ pub fn quick_select(dat: &mut Vec<i32>, k: usize) -> i32 {
 	dat[k]
 }
 
-fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
+fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
 	assert!(min <= max, "qselect min extent gt max extent");
 	assert!(max <= dat.len(), "qselect max extent gt vector len");
 
@@ -202,7 +202,7 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
 
 	// random pivot
 	dat.swap(min, rand::thread_rng().gen_range(min, max));
-	let pidx = partition(dat, min, max);
+	let pidx = partition(&mut dat[min..max]) + min;
 
 	// process only subpartition needed to position kth element
 	if k < pidx {
@@ -224,7 +224,7 @@ fn quick_select_int(dat: &mut Vec<i32>, min: usize, max: usize, k: usize) {
  *     rightchild(i) = 2*i+2
  *
  */
-pub fn make_implicit_max_heap(dat: &mut Vec<i32>) {
+pub fn make_implicit_max_heap(dat: &mut [i32]) {
 	// nothing to do
 	if dat.len() < 2 {
 		return;
@@ -240,11 +240,11 @@ pub fn make_implicit_max_heap(dat: &mut Vec<i32>) {
 	let far_right = parent_idx(end-1);
 	for i in 0..far_right+1 {
 		let root_idx = far_right - i;
-		sift_down(dat, root_idx, end);
+		sift_down(&mut dat[..], root_idx);
 	}
 }
 
-fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
+fn sift_down(dat: &mut [i32], start: usize) {
 	fn left_child_idx(node_idx: usize) -> usize {
 		return 2*node_idx+1;
 	}
@@ -254,7 +254,7 @@ fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
 
 	// swap wiggle element downwards with largest child until heap property
 	// re-established
-	while left_child_idx(wiggle_idx) < end {
+	while left_child_idx(wiggle_idx) < dat.len() {
 
 		let mut swap_target = wiggle_idx;
 
@@ -267,7 +267,7 @@ fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
 		}
 
 		// right child greater than wiggle and left child
-		if right_idx < end && dat[right_idx] > dat[swap_target] {
+		if right_idx < dat.len() && dat[right_idx] > dat[swap_target] {
 			swap_target = right_idx;
 		}
 
@@ -284,7 +284,7 @@ fn sift_down(dat: &mut Vec<i32>, start: usize, end: usize) {
 /*
  * Heap sort.
  */
-pub fn heap_sort(dat: &mut Vec<i32>) {
+pub fn heap_sort(dat: &mut [i32]) {
 	// nothing to do
 	if dat.len() < 2 {
 		return;
@@ -298,7 +298,7 @@ pub fn heap_sort(dat: &mut Vec<i32>) {
 	let len = dat.len();
 	for i in 0..len {
 		dat.swap(0, len-i-1);
-		sift_down(dat, 0, len-i-1);
+		sift_down(&mut dat[0..len-i-1], 0);
 	}
 }
 
@@ -308,14 +308,14 @@ pub fn heap_sort(dat: &mut Vec<i32>) {
  * Kept it as a pure implementation; does not switch to a non-recursive sort at
  * small partition sizes.
  */
-pub fn merge_sort(dat: &mut Vec<i32>) {
+pub fn merge_sort(dat: &mut [i32]) {
 	// requires O(n) scratch space
 	let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
 	let max = dat.len();
 	merge_sort_int(dat, 0, max, &mut scratch);
 }
 
-fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<i32>) {
+fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32>) {
 
 	// empty and single-element list already sorted
 	if max - min < 2 {
@@ -331,7 +331,7 @@ fn merge_sort_int(dat: &mut Vec<i32>, min: usize, max: usize, scratch: &mut Vec<
 	combine_chunks(dat, min, mid, max, scratch);
 }
 
-fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
+fn combine_chunks(dat: &mut [i32], lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
 
 	scratch.clear();
 	let mut li : usize = lmin;
@@ -362,7 +362,7 @@ fn combine_chunks(dat: &mut Vec<i32>, lmin : usize, mid : usize, rmax : usize, s
 /*
  * Insertion sort.  Stable and can be made online, but quadratic.
  */
-pub fn insertion_sort(dat: &mut Vec<i32>) {
+pub fn insertion_sort(dat: &mut [i32]) {
 	// nothing to do
 	if dat.len() < 2 {
 		return;
@@ -392,7 +392,7 @@ pub fn insertion_sort(dat: &mut Vec<i32>) {
 /*
  * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
  */
-pub fn bogo_sort(dat: &mut Vec<i32>) {
+pub fn bogo_sort(dat: &mut [i32]) {
 	let mut sorted = false;
 	while !sorted {
 		// randomly shuffle input
@@ -406,7 +406,7 @@ pub fn bogo_sort(dat: &mut Vec<i32>) {
 /*
  * Binary search.  Input must already be sorted.
  */
-pub fn binary_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+pub fn binary_search(dat: &[i32], searchval: i32) -> Option<usize> {
 	if dat.len() == 0 {
 		return None;
 	}
@@ -443,7 +443,7 @@ pub fn binary_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
  * that you were scanning where performance was dominated by seek rather than
  * read time.
  */
-pub fn jump_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+pub fn jump_search(dat: &[i32], searchval: i32) -> Option<usize> {
 	if dat.len() == 0 {
 		return None;
 	}
@@ -471,7 +471,7 @@ pub fn jump_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
 /*
  * incomplete - hyperghetto stub of interpolation search.
  */
-pub fn interpolation_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
+pub fn interpolation_search(dat: &[i32], searchval: i32) -> Option<usize> {
 	if dat.len() == 0 {
 		return None;
 	}
@@ -515,7 +515,7 @@ pub fn interpolation_search(dat: &Vec<i32>, searchval: i32) -> Option<usize> {
 /*
  * Verify if vector is sorted.
  */
-pub fn is_sorted(dat: &Vec<i32>) -> bool {
+pub fn is_sorted(dat: &[i32]) -> bool {
 	for i in 1..dat.len() {
 		if dat[i] < dat[i-1] {
 			return false;
@@ -529,7 +529,7 @@ pub fn is_sorted(dat: &Vec<i32>) -> bool {
  *
  * Rust has a built-in for this; this implementation is just for fun.
  */
-pub fn reverse(dat: &mut Vec<i32>) {
+pub fn reverse(dat: &mut [i32]) {
 	let len = dat.len();
 	for i in 0..len/2 {
 		dat.swap(i,len-i-1);
@@ -627,28 +627,28 @@ mod tests {
 
 		// empty right partition
 		let mut v1 = vec![1, 0, 0, 0];
-		let p1 = partition(&mut v1, 0, 4);
+		let p1 = partition(&mut v1[..]);
 		assert!(p1 == 3, "pivot not in right final location");
 		assert!(left_ok(&v1, 1, 0, p1), "left partition invalid");
 		assert!(right_ok(&v1, 1, p1+1, 4), "right partition invalid");
 
 		// empty left partition
 		let mut v2 = vec![0, 1, 1, 1];
-		let p2 = partition(&mut v2, 0, 4);
+		let p2 = partition(&mut v2[..]);
 		assert!(p2 == 0, "pivot not in right final location");
 		assert!(left_ok(&v2, 0, 0, p2), "left partition invalid");
 		assert!(right_ok(&v2, 0, p2+1, 4), "right partition invalid");
 
 		// partition on each side
 		let mut v3 = vec![3, 5, 0, 1, 2, 4];
-		let p3 = partition(&mut v3, 0, 6);
+		let p3 = partition(&mut v3[..]);
 		assert!(p3 == 3, "pivot not in right final location");
 		assert!(left_ok(&v3, 3, 0, p3), "left partition invalid");
 		assert!(right_ok(&v3, 3, p3+1, 6), "right partition invalid");
 
 		// both partitions empty
 		let mut v4 = vec![42];
-		let p4 = partition(&mut v4, 0, 1);
+		let p4 = partition(&mut v4[..]);
 		assert!(p4 == 0, "pivot not in right final location");
 		assert!(left_ok(&v4, 42, 0, p4), "left partition invalid");
 		assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
@@ -755,7 +755,7 @@ mod tests {
 	fn test_bogo_sort() {
 		// try degenerate and small cases
 		for n in 0..6 {
-			let mut dat = (0..n).collect();
+			let mut dat: Vec<i32> = (0..n).collect();
 			fisher_yates_shuffle(&mut dat);
 			bogo_sort(&mut dat);
 			assert!(is_sorted(&dat), "result not properly sorted");
