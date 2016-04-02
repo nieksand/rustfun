@@ -41,29 +41,18 @@ pub fn list_len(n: &Option<Box<Node>>) -> usize {
 	len
 }
 
-//
-//pub fn list_len(n: &Node) -> usize {
-//	
-//
-//
-//}
-
-//pub fn list_to_vec(head: &Option<Box<Node>>) -> Vec<i32> {
-//
-//	let mut v: Vec<i32> = Vec::new();
-//
-//	let mut nptr = head;
-//	loop {
-//		match *nptr {
-//			None 	=> break,
-//			Some(n) => {
-//				v.push(n.val);
-//				nptr = &n.next;
-//			}	
-//		}
-//	}
-//	return v;
-//}
+pub fn list_contains(n: &Option<Box<Node>>, val: i32) -> bool {
+	let mut found = false;
+	let mut cur = n;
+	while !found {
+		match *cur {
+			None	     => break,
+			Some(ref nb) => { found = nb.val == val;
+							  cur = &nb.next; },
+		}
+	}
+	found
+}
 
 
 #[cfg(test)]
@@ -74,6 +63,10 @@ mod tests {
 	fn test_vec_to_list() {
 		let v: Vec<i32> = vec![3,2,1,0,4,5,6,7];
 		let y = vec_to_list(&v);
+
 		assert!(list_len(&y) == v.len());
+		assert!(list_contains(&y, 7));
+		assert!(list_contains(&y, 2));
+		assert!(!list_contains(&y, 8));
 	}
 }
