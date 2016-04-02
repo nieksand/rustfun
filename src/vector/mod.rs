@@ -537,6 +537,7 @@ pub fn reverse(dat: &mut [i32]) {
 }
 
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -860,14 +861,4 @@ mod tests {
 		reverse(&mut v5);
 		assert!(v5 == v5_orig, "double reverse should equal start");
 	}
-
-/*
-	#[test]
-	fn test_meowmix() {
-		let mut dat: Vec<i32> = (0..30000000).collect();
-		fisher_yates_shuffle(&mut dat);
-		merge_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-	}
-*/
 }
