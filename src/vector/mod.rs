@@ -5,6 +5,7 @@
  *   - Partition by Pivot
  *   - Quick Sort
  *   - Quick Select
+ *   - Naive Select
  *   - Implicit Max Heap
  *   - Heap Sort
  *   - Merge Sort
@@ -171,6 +172,17 @@ fn quick_sort_int(dat: &mut [i32], min: usize, max: usize) {
 	// sort subpartitions
 	quick_sort_int(dat, min, pidx);
 	quick_sort_int(dat, pidx+1, max);
+}
+
+/*
+ * Naive method for selecting k-th smallest element.
+ *
+ * Just sorts and grabs.
+ */
+pub fn naive_select(dat: &mut [i32], k: usize) -> i32 {
+	assert!(k < dat.len(), "k-th element not in data bounds");
+	quick_sort(dat);
+	dat[k]
 }
 
 /*
@@ -688,6 +700,18 @@ mod tests {
 			quick_sort(&mut dat);
 			assert!(is_sorted(&dat), "result not properly sorted");
 		}
+	}
+
+	#[test]
+	fn test_naive_select() {
+		let mut dat: Vec<i32> = (0..100).collect();
+		fisher_yates_shuffle(&mut dat);
+
+		let k10 = naive_select(&mut dat, 10);
+		assert!(k10 == 10, "naive select did not pick 10th element");
+
+		let k99 = naive_select(&mut dat, 99);
+		assert!(k99 == 99, "naive select did not pick 99th element");
 	}
 
 	#[test]
