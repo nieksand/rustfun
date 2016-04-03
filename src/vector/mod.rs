@@ -9,6 +9,7 @@
  *   - Heap Sort
  *   - Merge Sort
  *   - Insertion Sort
+ *   - Selection Sort
  *   - Bogo Sort
  *   - Binary Search
  *   - Jump Search
@@ -390,6 +391,24 @@ pub fn insertion_sort(dat: &mut [i32]) {
 }
 
 /*
+ * Selection sort.  Quadratic and I have never encountered a real use case for
+ * it.  Sedgewick points out that it does the minimum number of swaps, so is
+ * plausible for huge items with small keys.  But honestly, just do an indirect
+ * sort for that.
+ */
+pub fn selection_sort(dat: &mut [i32]) {
+	for i in 0..dat.len() {
+		let mut min = i;
+		for j in i+1..dat.len() {
+			if dat[j] < dat[min] {
+				min = j;
+			}
+		}
+		dat.swap(i,min);
+	}
+}
+
+/*
  * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
  */
 pub fn bogo_sort(dat: &mut [i32]) {
@@ -748,6 +767,22 @@ mod tests {
 			dat = (0..n).collect();
 			fisher_yates_shuffle(&mut dat);
 			insertion_sort(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
+	}
+
+	#[test]
+	fn test_selection_sort() {
+		let mut dat: Vec<i32> = (0..5000).collect();
+		fisher_yates_shuffle(&mut dat);
+		selection_sort(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			selection_sort(&mut dat);
 			assert!(is_sorted(&dat), "result not properly sorted");
 		}
 	}
