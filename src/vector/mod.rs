@@ -648,6 +648,23 @@ pub fn shaker_sort(dat: &mut [i32]) {
 mod tests {
     use super::*;
 
+	fn sort_eval<F>(randsize: i32, sortfn: F) 
+		// decently sized random vector
+		where F: Fn(&mut [i32]) -> () {
+		let mut dat: Vec<i32> = (0..randsize).collect();
+		fisher_yates_shuffle(&mut dat);
+		sortfn(&mut dat);
+		assert!(is_sorted(&dat), "result not properly sorted");
+
+		// try degenerate and small cases
+		for n in 0..6 {
+			dat = (0..n).collect();
+			fisher_yates_shuffle(&mut dat);
+			sortfn(&mut dat);
+			assert!(is_sorted(&dat), "result not properly sorted");
+		}
+	}
+
 	#[test]
 	fn test_fisher_yates_shuffle() {
 		// start with identical sequences
@@ -763,18 +780,7 @@ mod tests {
 
 	#[test]
 	fn test_quick_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		quick_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			quick_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, quick_sort);
 	}
 
 	#[test]
@@ -824,77 +830,27 @@ mod tests {
 
 	#[test]
 	fn test_heap_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		heap_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			heap_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, heap_sort);
 	}
 
 	#[test]
 	fn test_merge_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		merge_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			merge_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, merge_sort);
 	}
 
 	#[test]
 	fn test_insertion_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		insertion_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			insertion_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, insertion_sort);
 	}
 
 	#[test]
 	fn test_selection_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		selection_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			selection_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, selection_sort);
 	}
 
 	#[test]
 	fn test_bogo_sort() {
-		// try degenerate and small cases
-		for n in 0..6 {
-			let mut dat: Vec<i32> = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			bogo_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(6, bogo_sort);
 	}
 
 	#[test]
@@ -998,40 +954,11 @@ mod tests {
 
 	#[test]
 	fn test_shaker_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		shaker_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			shaker_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, shaker_sort);
 	}
 
 	#[test]
 	fn test_bubble_sort() {
-		let mut dat: Vec<i32> = (0..5000).collect();
-		fisher_yates_shuffle(&mut dat);
-		bubble_sort(&mut dat);
-		assert!(is_sorted(&dat), "result not properly sorted");
-
-		// try degenerate and small cases
-		for n in 0..6 {
-			dat = (0..n).collect();
-			fisher_yates_shuffle(&mut dat);
-			bubble_sort(&mut dat);
-			assert!(is_sorted(&dat), "result not properly sorted");
-		}
+		sort_eval(5000, bubble_sort);
 	}
-
-	//#[test]
-	//fn test_meowmix() {
-	//	let mut dat: Vec<i32> = (0..100000).collect();
-	//	fisher_yates_shuffle(&mut dat);
-	//	shaker_sort(&mut dat);
-	//}
 }
