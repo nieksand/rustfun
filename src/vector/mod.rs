@@ -25,6 +25,8 @@
  *   4) In-situ permutation
  *   5) Indirect sort
  *   6) List sorts
+ *   7) Templatized hybrid sort helper
+ *   8) External sort
  *
  * Maybe:
  *   1) Interpolation Search
