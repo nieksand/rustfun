@@ -27,6 +27,7 @@
  *   6) List sorts
  *   7) Templatized hybrid sort helper
  *   8) External sort
+ *   9) Three way quicksort
  *
  * Maybe:
  *   1) Interpolation Search
@@ -849,6 +850,16 @@ mod tests {
 	}
 
 	#[test]
+	fn test_shaker_sort() {
+		sort_eval(5000, shaker_sort);
+	}
+
+	#[test]
+	fn test_bubble_sort() {
+		sort_eval(5000, bubble_sort);
+	}
+
+	#[test]
 	fn test_bogo_sort() {
 		sort_eval(6, bogo_sort);
 	}
@@ -950,15 +961,5 @@ mod tests {
 		reverse(&mut v5);
 		reverse(&mut v5);
 		assert!(v5 == v5_orig, "double reverse should equal start");
-	}
-
-	#[test]
-	fn test_shaker_sort() {
-		sort_eval(5000, shaker_sort);
-	}
-
-	#[test]
-	fn test_bubble_sort() {
-		sort_eval(5000, bubble_sort);
 	}
 }
