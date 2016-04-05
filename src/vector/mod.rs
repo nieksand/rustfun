@@ -431,6 +431,72 @@ pub fn selection_sort(dat: &mut [i32]) {
 }
 
 /*
+ * Shaker sort.  Just for fun.
+ *
+ * This is a variant of bubble sort mentioned by Sedgewick where you basically
+ * alternate the direction of bubbling in each pass.
+ */
+pub fn shaker_sort(dat: &mut [i32]) {
+
+	// sorted bounds [0,min) and [max,len)
+	let mut min : i64 = 0;
+	let mut max : i64 = dat.len() as i64;
+
+	// direction of shake
+	let mut dir: i64 = 1;
+
+	while min != max {
+
+		if dir == 1 {
+			for i in min..max-1 {
+				let cur = i as usize;
+				let nex = (i+dir) as usize;
+
+				if dat[cur] > dat[nex] {
+					dat.swap(cur,nex);
+				}
+			}
+			max -= 1
+		} else {
+			for i in (min+1..max+1).rev() {
+				let cur = i as usize;
+				let nex = (i+dir) as usize;
+
+				if dat[cur] < dat[nex] {
+					dat.swap(cur,nex);
+				}
+			}
+			min += 1
+		}
+		dir = -dir;
+	}
+}
+
+/*
+ * Bubble sort.  Just for completeness.
+ */
+pub fn bubble_sort(dat: &mut [i32]) {
+	// nothing to do
+	if dat.len() < 2 {
+		return;
+	}
+
+	for i in 1..dat.len() {
+		let mut swapped = false;
+		for j in 0..dat.len()-i {
+			if dat[j] > dat[j+1] {
+				dat.swap(j,j+1);
+				swapped = true;
+			}
+		}
+
+		if !swapped {
+			break;
+		}
+	}
+}
+
+/*
  * Bogosort!  Just for fun.  Optimized build can handle about size 10 inputs.
  */
 pub fn bogo_sort(dat: &mut [i32]) {
@@ -578,79 +644,11 @@ pub fn reverse(dat: &mut [i32]) {
 }
 
 
-/*
- * Bubble sort.  Just for completeness.
- */
-pub fn bubble_sort(dat: &mut [i32]) {
-	// nothing to do
-	if dat.len() < 2 {
-		return;
-	}
-
-	for i in 1..dat.len() {
-		let mut swapped = false;
-		for j in 0..dat.len()-i {
-			if dat[j] > dat[j+1] {
-				dat.swap(j,j+1);
-				swapped = true;
-			}
-		}
-
-		if !swapped {
-			break;
-		}
-	}
-}
-
-
-/*
- * Shaker sort.  Just for fun. 
- *
- * This is a variant of bubble sort mentioned by Sedgewick where you basically
- * alternate the direction of bubbling in each pass.
- */
-pub fn shaker_sort(dat: &mut [i32]) {
-
-	// sorted bounds [0,min) and [max,len)
-	let mut min : i64 = 0;
-	let mut max : i64 = dat.len() as i64;
-
-	// direction of shake
-	let mut dir: i64 = 1;
-
-	while min != max {
-
-		if dir == 1 {
-			for i in min..max-1 {
-				let cur = i as usize;
-				let nex = (i+dir) as usize;
-
-				if dat[cur] > dat[nex] {
-					dat.swap(cur,nex);
-				}
-			}
-			max -= 1
-		} else {
-			for i in (min+1..max+1).rev() {
-				let cur = i as usize;
-				let nex = (i+dir) as usize;
-
-				if dat[cur] < dat[nex] {
-					dat.swap(cur,nex);
-				}
-			}
-			min += 1
-		}
-		dir = -dir;
-	}
-}
-
-
 #[cfg(test)]
 mod tests {
     use super::*;
 
-	fn sort_eval<F>(randsize: i32, sortfn: F) 
+	fn sort_eval<F>(randsize: i32, sortfn: F)
 		// decently sized random vector
 		where F: Fn(&mut [i32]) -> () {
 		let mut dat: Vec<i32> = (0..randsize).collect();
