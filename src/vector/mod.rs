@@ -11,6 +11,8 @@
  *   - Merge Sort
  *   - Insertion Sort
  *   - Selection Sort
+ *   - Shaker Sort
+ *   - Bubble Sort
  *   - Bogo Sort
  *   - Binary Search
  *   - Jump Search
@@ -19,11 +21,10 @@
  * Todo:
  *   1) Radix sort
  *   2) Heap's Permutations
- *   3) Shaker sort
- *   4) Shell sort
- *   5) In-situ permutation
- *   6) Indirect sort
- *   7) List sorts
+ *   3) Shell sort
+ *   4) In-situ permutation
+ *   5) Indirect sort
+ *   6) List sorts
  *
  * Maybe:
  *   1) Interpolation Search
