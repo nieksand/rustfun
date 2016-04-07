@@ -28,6 +28,7 @@
  *   7) Templatized hybrid sort helper
  *   8) External sort
  *   9) Three way quicksort
+ *   10) Templatize the sorts
  *
  * Maybe:
  *   1) Interpolation Search
