@@ -18,6 +18,10 @@ pub struct Slist {
 }
 
 impl Slist {
+	pub fn head(&self) -> &Option<Box<Node>> {
+		&self.head
+	}
+
 	pub fn len(&self) -> usize {
 		self.len
 	}
@@ -37,9 +41,9 @@ impl Node {
 /*
  * Convert vector to linked list representation.
  */
-pub fn vec_to_list(dat: &Vec<i32>) -> Option<Box<Node>> {
+pub fn vec_to_list(dat: &Vec<i32>) -> Slist {
 	if dat.len() == 0 {
-		return None;
+		return Slist{head: None, len: 0};
 	}
 
 	let mut prev_node: Option<Box<Node>> = None;
@@ -48,31 +52,15 @@ pub fn vec_to_list(dat: &Vec<i32>) -> Option<Box<Node>> {
 		prev_node = Some(Box::new(n));
 	}
 
-	return prev_node;
-}
-
-/*
- * Get length of list.
- */
-pub fn list_len(n: &Option<Box<Node>>) -> usize {
-	let mut len = 0;
-	let mut cur = n;
-	loop {
-		match *cur {
-			None	     => break,
-			Some(ref nb) => cur = &nb.next,
-		}
-		len += 1;
-	}
-	len
+	return Slist{head: prev_node, len: dat.len()}
 }
 
 /*
  * Check if element in list.
  */
-pub fn list_contains(n: &Option<Box<Node>>, val: i32) -> bool {
+pub fn list_contains(list: &Slist, val: i32) -> bool {
 	let mut found = false;
-	let mut cur = n;
+	let mut cur = list.head();
 	while !found {
 		match *cur {
 			None	     => break,
@@ -89,13 +77,28 @@ mod tests {
     use super::*;
 
 	#[test]
-	fn test_vec_to_list() {
+	fn test_slist_contains() {
 		let v: Vec<i32> = vec![3,2,1,0,4,5,6,7];
-		let y = vec_to_list(&v);
+		let list = vec_to_list(&v);
 
-		assert!(list_len(&y) == v.len());
-		assert!(list_contains(&y, 7));
-		assert!(list_contains(&y, 2));
-		assert!(!list_contains(&y, 8));
+		assert!(list.len() == v.len());
+		assert!(list_contains(&list, 7));
+		assert!(list_contains(&list, 2));
+		assert!(!list_contains(&list, 8));
+	}
+
+	#[test]
+	fn test_slist_len() {
+		// empty list
+		let l0 = Slist{head: None, len: 0};
+		assert!(l0.len() == 0);
+
+		// one element list
+		let l1 = vec_to_list(&vec![1]);
+		assert!(l1.len() == 1);
+
+		// two element list
+		let l2 = vec_to_list(&vec![1,2]);
+		assert!(l2.len() == 2);
 	}
 }
