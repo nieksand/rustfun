@@ -56,6 +56,21 @@ pub fn vec_to_list(dat: &Vec<i32>) -> Slist {
 }
 
 /*
+ * Convert linked list to vector representation.
+ */
+pub fn list_to_vec(list: &Slist) -> Vec<i32> {
+	let mut res: Vec<i32> = Vec::with_capacity(list.len());
+	let mut node = list.head();
+	loop {
+		match *node {
+			None	 	 => break,
+			Some(ref nb) => { res.push(nb.val); node = &nb.next; },
+		}
+	}
+	res
+}
+
+/*
  * Check if element in list.
  */
 pub fn list_contains(list: &Slist, val: i32) -> bool {
@@ -75,6 +90,14 @@ pub fn list_contains(list: &Slist, val: i32) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+	#[test]
+	fn test_slist_vec_list_convert() {
+		let v1: Vec<i32> = vec![5,3,1,0,4,2];
+		let l = vec_to_list(&v1);
+		let v2 = list_to_vec(&l);
+		assert!(v1 == v2);
+	}
 
 	#[test]
 	fn test_slist_contains() {
