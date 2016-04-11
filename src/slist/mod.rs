@@ -25,6 +25,16 @@ impl Slist {
 	pub fn len(&self) -> usize {
 		self.len
 	}
+
+	pub fn reverse(&mut self) {
+		// let mut node = list.head();
+		// loop {
+		// 	match *node {
+		// 		None	 	 => break,
+		// 		Some(ref nb) => { res.push(nb.val); node = &nb.next; },
+		// 	}
+		// }
+	}
 }
 
 pub struct Node {
@@ -123,5 +133,17 @@ mod tests {
 		// two element list
 		let l2 = vec_to_list(&vec![1,2]);
 		assert!(l2.len() == 2);
+	}
+
+	#[test]
+	fn test_slist_reverse() {
+		let v_in: Vec<i32> = (0..10).collect();
+		let mut l = vec_to_list(&v_in);
+
+		l.reverse();
+		let v_out = list_to_vec(&l);
+
+		let v_truth: Vec<i32> = (0..10).rev().collect();
+		assert!(v_out == v_truth);
 	}
 }
