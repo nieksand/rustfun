@@ -3,9 +3,8 @@
  *
  * Design choices:
  *
- *   - [TODO] Wrapper struct for list rather than using head node directly.
- *            Gives us a place to store list length and changes that operation
- *            from O(n) to O(1).
+ *   - Wrapper struct for list rather than using head node directly.  Gives us a
+ *     place to store list length and changes that operation from O(n) to O(1).
  *
  *   - [TODO] Templatized list/node type to embed contained value directly in
  *            list nodes.  Avoids unneeded pointer redirection.
@@ -27,13 +26,21 @@ impl Slist {
 	}
 
 	pub fn reverse(&mut self) {
-		// let mut node = list.head();
-		// loop {
-		// 	match *node {
-		// 		None	 	 => break,
-		// 		Some(ref nb) => { res.push(nb.val); node = &nb.next; },
-		// 	}
-		// }
+		//let c = self.head.clone();
+		//self.head = None;
+
+		//let mut pre: Option<Box<Node>> = None;
+		//loop {
+		//	let cur = self.head;
+		//	match cur {
+		//		None		 => break,
+		//		Some(nb) => {
+		//			nb.next = pre;
+		//			pre = cur;
+		//		},
+		//	}
+		//}
+		//self.head = pre;
 	}
 }
 
