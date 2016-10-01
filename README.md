@@ -1,4 +1,5 @@
 # Rust Algorithms
+This is just me having fun implementing various algorithms in Rust.
 
 ## Vector Algorithms (vector)
 Common algorithms for working with vectors.
@@ -25,17 +26,3 @@ Maybe
   * Interpolation Search
   * Variance calculation
   * Morris Approximate Counting
-
-
-## Binary Search Trees (bst)
-BST implementation.
-
-Todo
-  * Basic BST
-  * RB Tree
-
-
-## Singly Linked List (slist)
-
-## Doubly Linked List (dlist)
-
