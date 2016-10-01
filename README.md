@@ -14,6 +14,9 @@ Completed
   * Heap Sort
   * Merge Sort
   * Insertion Sort
+  * Selection Sort
+  * Shaker Sort
+  * Bubble Sort
   * Bogo Sort
   * Binary Search
   * Jump Search
