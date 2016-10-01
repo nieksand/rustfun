@@ -346,7 +346,7 @@ fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32
 	}
 
 	// split in two and sort each chunk
-	let mid = (max+min)/2;
+	let mid = min + (max-min)/2;
 	merge_sort_int(dat, min, mid, scratch);
 	merge_sort_int(dat, mid, max, scratch);
 
