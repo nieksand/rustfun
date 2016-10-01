@@ -11,6 +11,10 @@ use std::f64;
 
 
 
+/*
+ * Optimal hash count for given bloom filter.  This is determined by the size (#
+ * bits) together with the epected cardinality of items in the filter.
+ */
 pub fn get_optimal_hash_count(nbits: i64, nelem: i64) -> i32 {
 
 	// corner case
@@ -26,9 +30,6 @@ pub fn get_optimal_hash_count(nbits: i64, nelem: i64) -> i32 {
 	// ensure at least one hash
 	cmp::max(optimal_k, 1)
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
