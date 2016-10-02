@@ -677,11 +677,47 @@ pub fn dedupe(dat: &mut Vec<i32>) {
 	dat.resize(widx, -1);
 }
 
+/*
+ * Naive O(n^2) algorithm for finding largest subsequence.
+ *
+ * Enumerates all possible subsequences and returns longest one. 
+ */
+pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
+
+	if dat.len() == 0 {
+		return (0,0);
+	}
+
+	let mut lidx = 0;
+	let mut ridx = 1;
+	let mut maxsum = dat[0];
+
+	for i in 0..dat.len() {
+		let mut cursum = 0;
+		for j in i..dat.len() {
+			cursum += dat[j];
+
+			if cursum > maxsum || (cursum == maxsum && (j-i+1) > (ridx-lidx)) {
+				lidx = i;
+				ridx = j+1;
+				maxsum = cursum;
+			}
+		}
+	}
+	
+	(lidx, ridx)
+}
+
+pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
+	(0,0)
+}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+	// runs arbitrary sort function through test battery
 	fn sort_eval<F>(randsize: i32, sortfn: F)
 		// decently sized random vector
 		where F: Fn(&mut [i32]) -> () {
@@ -1029,5 +1065,38 @@ mod tests {
 			let msg = format!("{:?} != {:?}", dat, truths[i]);
 			assert!(dat == truths[i], msg);
 		}
+	}
+
+	// runs aribtrary largest subsequence function through test battery
+	fn largest_subseq_eval<F>(subseqfn: F)
+		where F: Fn(&[i32]) -> (usize, usize) {
+
+		let (a, b) = subseqfn(&vec![]);
+		assert!(a == 0 && b == 0, "failed degenerate case");
+
+		let (a, b) = subseqfn(&vec![42]);
+		assert!(a == 0 && b == 1, "failed single-element case");
+
+		let test = vec![10, -5, 6];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 0 && b == 3, "failed crossing valley");
+
+		let test = vec![-1, 10, -5, 6, -10, 100, -1];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 1 && b == 6, "failed crossing double valley");
+
+		let test = vec![10, 0, 0, 1, 0];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 0 && b == 5, "failed including trailing zeros");
+	}
+
+	#[test]
+	fn test_largest_subseq_naive() {
+		largest_subseq_eval(largest_subseq_naive);
+	}
+
+	#[test]
+	fn test_largest_subseq_sweep() {
+		largest_subseq_eval(largest_subseq_sweep);
 	}
 }
