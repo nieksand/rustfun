@@ -15,4 +15,4 @@ Searches: binary, jump
 Selects: quick, naive
 
 Misc: Fisher-Yates shuffle, Boyer-Moore Majority, Partition by Pivot, Max Heap,
-Reverse Sequene
+Reverse, Is Sorted, Is Anagram
