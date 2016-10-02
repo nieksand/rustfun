@@ -667,10 +667,33 @@ pub fn is_anagram(dat: &str) -> bool {
 	true
 }
 
-pub fn dedupe(dat: &mut [i32]) {
+/*
+ * Remove duplicates from an array.
+ *
+ * Sorts to make life easy.  Does transform in-place, truncating away any dupes.
+ */
+pub fn dedupe(dat: &mut Vec<i32>) {
+	if dat.len() == 0 {
+		return;
+	}
 
-	quick_sort(dat)
+	quick_sort(dat);
 
+	// next index to write non-dupe value to
+	let mut widx: usize = 1;
+	let mut last = dat[0];
+
+	// shift left to overwrite dupes
+	for ridx in 1..dat.len() {
+		if dat[ridx] != last {
+			dat[widx] = dat[ridx];
+			last = dat[ridx];
+			widx += 1;
+		}
+	}
+
+	// truncate garbage at end
+	dat.resize(widx, -1);
 }
 
 
@@ -1008,12 +1031,14 @@ mod tests {
 		let ins = vec![
 			vec![],
 			vec![1,2,3,4,5],
+			vec![1,1,1,2,2,2],
 			vec![1,2,3,4,2],
 			vec![1,1,1,1,1]];
 
 		let truths = vec![
 			vec![],
 			vec![1,2,3,4,5],
+			vec![1,2],
 			vec![1,2,3,4],
 			vec![1]];
 
