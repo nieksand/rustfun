@@ -708,8 +708,40 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 	(lidx, ridx)
 }
 
+/*
+ * incomplete - sweeping O(n) longest subsequence algo.
+ */
 pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
-	(0,0)
+
+	if dat.len() == 0 {
+		return (0,0);
+	}
+
+	// running sum left-to-right tracking largest value seen
+	let mut ridx = 0;
+	let mut maxsum = dat[0];
+	let mut cursum = dat[0];
+	for i in 1..dat.len() {
+		cursum += dat[i];
+		if cursum >= maxsum {
+			maxsum = cursum;
+			ridx = i;
+		}
+	}
+
+	// from largest value sweep right-to-left to find other extent
+	let mut lidx = ridx;
+	maxsum = dat[ridx];
+	cursum = dat[ridx];
+	for j in 1..ridx {
+		cursum += dat[ridx-j];
+		if cursum >= maxsum {
+			maxsum = cursum;
+			lidx = j;
+		}
+	}
+
+	(lidx,ridx+1)
 }
 
 
