@@ -1,23 +1,4 @@
 /*
- * Completed:
- *   - Fisher-Yates Shuffle
- *   - Boyer-Moore Majority Vote
- *   - Partition by Pivot
- *   - Quick Sort
- *   - Quick Select
- *   - Naive Select
- *   - Implicit Max Heap
- *   - Heap Sort
- *   - Merge Sort
- *   - Insertion Sort
- *   - Selection Sort
- *   - Shaker Sort
- *   - Bubble Sort
- *   - Bogo Sort
- *   - Binary Search
- *   - Jump Search
- *   - Reverse Sequence
- *
  * Todo:
  *   1) Radix sort
  *   2) Heap's Permutations
