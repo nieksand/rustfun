@@ -667,6 +667,12 @@ pub fn is_anagram(dat: &str) -> bool {
 	true
 }
 
+pub fn dedupe(dat: &mut [i32]) {
+
+	quick_sort(dat)
+
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -995,5 +1001,27 @@ mod tests {
 		assert!(is_anagram("a"));
 		assert!(is_anagram("moo oom"));
 		assert!(!is_anagram("hello world"));
+	}
+
+	#[test]
+	fn test_dedupe() {
+		let ins = vec![
+			vec![],
+			vec![1,2,3,4,5],
+			vec![1,2,3,4,2],
+			vec![1,1,1,1,1]];
+
+		let truths = vec![
+			vec![],
+			vec![1,2,3,4,5],
+			vec![1,2,3,4],
+			vec![1]];
+
+		for i in 0..ins.len() {
+			let mut dat = ins[i].clone();
+			dedupe(&mut dat);
+			let msg = format!("{:?} != {:?}", dat, truths[i]);
+			assert!(dat == truths[i], msg);
+		}
 	}
 }
