@@ -1,31 +1,18 @@
 # Rust Algorithms
-This is just me having fun implementing various algorithms in Rust.
+This is me having fun implementing various algorithms and datastructures in
+Rust.  Being idiomatic for the language is not particularly a goal--much of this
+code could be satisfied by the standard library instead.
 
 ## Vector Algorithms (vector)
-Common algorithms for working with vectors.
+Algorithms operating on vectors.  Obviously, many could be further generalized
+C++ iterator style to deal with more arbitrary collections.  I also haven't
+bother templatizing most of the routines yet.
 
-Completed
-  * Fisher-Yates Shuffle
-  * Boyer-Moore Majority Vote
-  * Partition by Pivot
-  * Quick Sort
-  * Quick Select
-  * Implicit Max Heap
-  * Heap Sort
-  * Merge Sort
-  * Insertion Sort
-  * Selection Sort
-  * Shaker Sort
-  * Bubble Sort
-  * Bogo Sort
-  * Binary Search
-  * Jump Search
+Sorts: quick, heap, merge, insertion, selection, bubble, bogo, shaker.
 
-Todo
-  * Radix sort
-  * Heap's Permutations
+Searches: binary, jump
 
-Maybe
-  * Interpolation Search
-  * Variance calculation
-  * Morris Approximate Counting
+Selects: quick, naive
+
+Misc: Fisher-Yates shuffle, Boyer-Moore Majority, Partition by Pivot, Max Heap,
+Reverse Sequene
