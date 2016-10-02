@@ -559,7 +559,7 @@ pub fn jump_search(dat: &[i32], searchval: i32) -> Option<usize> {
 
 
 /*
- * incomplete - hyperghetto stub of interpolation search.
+ * incomplete - hyper-trashy stub of interpolation search.
  */
 pub fn interpolation_search(dat: &[i32], searchval: i32) -> Option<usize> {
 	if dat.len() == 0 {
