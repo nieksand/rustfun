@@ -645,6 +645,28 @@ pub fn reverse(dat: &mut [i32]) {
 	}
 }
 
+/*
+ * Checks if a string is an anagram.
+ *
+ * This code is clunkier and more inefficient than it needs to be.  Rust strings
+ * are UTF8 sequences which means iteration over direct indexing.  I'm not too
+ * familiar with my options yet, so I ended up with the cruft before.  Also note
+ * that this iterates the full string rather than to the half-way point.
+ */
+pub fn is_anagram(dat: &str) -> bool {
+	let fwd = dat.chars();
+	let mut rev = dat.chars().rev();
+	for ch in fwd {
+		match rev.next() {
+			None => panic!("rev iterator shorter than fwd"),
+			Some(rch) => {
+				if ch != rch { return false; }
+			}
+		}
+	}
+	true
+}
+
 
 #[cfg(test)]
 mod tests {
@@ -962,5 +984,16 @@ mod tests {
 		reverse(&mut v5);
 		reverse(&mut v5);
 		assert!(v5 == v5_orig, "double reverse should equal start");
+	}
+
+	#[test]
+	fn test_is_anagram() {
+		assert!(!is_anagram("potato"));
+		assert!(is_anagram("racecar"));
+		assert!(is_anagram("amanaplanacanalpanama"));
+		assert!(is_anagram(""));
+		assert!(is_anagram("a"));
+		assert!(is_anagram("moo oom"));
+		assert!(!is_anagram("hello world"));
 	}
 }
