@@ -67,8 +67,8 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
     }
 
     // pairing phase -- find candidate assuming strict majority exists
-    let mut candidate : i32 = dat[0];
-    let mut count : i64 = 1;
+    let mut candidate: i32 = dat[0];
+    let mut count: i64 = 1;
 
     for i in 1..dat.len() {
         if count == 0 {
@@ -83,7 +83,7 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
 
     // counting phase -- verify that candidate actually has strict majority
     count = 0;
-    let threshold : i64 = (dat.len() as i64) / 2;
+    let threshold: i64 = (dat.len() as i64) / 2;
     for v in dat {
         if *v == candidate {
             count += 1;
@@ -314,7 +314,7 @@ pub fn heap_sort(dat: &mut [i32]) {
  */
 pub fn merge_sort(dat: &mut [i32]) {
     // requires O(n) scratch space
-    let mut scratch : Vec<i32> = Vec::with_capacity(dat.len());
+    let mut scratch: Vec<i32> = Vec::with_capacity(dat.len());
     let max = dat.len();
     merge_sort_int(dat, 0, max, &mut scratch);
 }
@@ -338,8 +338,8 @@ fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32
 fn combine_chunks(dat: &mut [i32], lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
 
     scratch.clear();
-    let mut li : usize = lmin;
-    let mut ri : usize = mid;
+    let mut li: usize = lmin;
+    let mut ri: usize = mid;
 
     // merge two sorted lists
     while li < mid && ri < rmax {
@@ -422,8 +422,8 @@ pub fn selection_sort(dat: &mut [i32]) {
 pub fn shaker_sort(dat: &mut [i32]) {
 
     // sorted bounds [0,min) and [max,len)
-    let mut min : i64 = 0;
-    let mut max : i64 = dat.len() as i64;
+    let mut min: i64 = 0;
+    let mut max: i64 = dat.len() as i64;
 
     // direction of shake
     let mut dir: i64 = 1;
@@ -811,15 +811,15 @@ mod tests {
 
     #[test]
     fn test_fisher_yates_shuffle_degenerate() {
-        let mut v1 : Vec<i32> = vec![];
+        let mut v1: Vec<i32> = vec![];
         fisher_yates_shuffle(&mut v1);
         assert!(v1 == vec![], "empty vector unchanged by shuffle");
 
-        let mut v2 : Vec<i32> = vec![6];
+        let mut v2: Vec<i32> = vec![6];
         fisher_yates_shuffle(&mut v2);
         assert!(v2 == vec![6], "one-element vector unchanged by shuffle");
 
-        let mut v3 : Vec<i32> = vec![10,15];
+        let mut v3: Vec<i32> = vec![10,15];
         fisher_yates_shuffle(&mut v3);
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
