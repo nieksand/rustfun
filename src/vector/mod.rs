@@ -1097,19 +1097,17 @@ mod tests {
 
     #[test]
     fn test_dedupe() {
-        let ins = vec![
-            vec![],
-            vec![1,2,3,4,5],
-            vec![1,1,1,2,2,2],
-            vec![1,2,3,4,2],
-            vec![1,1,1,1,1]];
+        let ins = vec![vec![],
+                       vec![1,2,3,4,5],
+                       vec![1,1,1,2,2,2],
+                       vec![1,2,3,4,2],
+                       vec![1,1,1,1,1]];
 
-        let truths = vec![
-            vec![],
-            vec![1,2,3,4,5],
-            vec![1,2],
-            vec![1,2,3,4],
-            vec![1]];
+        let truths = vec![vec![],
+                          vec![1,2,3,4,5],
+                          vec![1,2],
+                          vec![1,2,3,4],
+                          vec![1]];
 
         for i in 0..ins.len() {
             let mut dat = ins[i].clone();
