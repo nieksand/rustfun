@@ -1120,6 +1120,18 @@ mod tests {
 		let (a, b) = subseqfn(&test);
 		assert!(a == 0 && b == 3, "failed crossing valley");
 
+		let test = vec![3, -100, 5];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 2 && b == 3, "failed crossing deep valley");
+
+		let test = vec![0, 10, -10, 10, 0];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 0 && b == 5, "failed crossing symmetric valley");
+
+		let test = vec![0, 1, 10, -100, 0, 0, 1, 10];
+		let (a, b) = subseqfn(&test);
+		assert!(a == 4 && b == 8, "failed on long-tailed valley");
+
 		let test = vec![-1, 10, -5, 6, -10, 100, -1];
 		let (a, b) = subseqfn(&test);
 		assert!(a == 1 && b == 6, "failed crossing double valley");
