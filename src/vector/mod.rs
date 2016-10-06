@@ -733,11 +733,11 @@ pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
 	let mut lidx = ridx;
 	maxsum = dat[ridx];
 	cursum = dat[ridx];
-	for j in 1..ridx {
+	for j in 1..ridx+1 {
 		cursum += dat[ridx-j];
 		if cursum >= maxsum {
 			maxsum = cursum;
-			lidx = j;
+			lidx = ridx-j;
 		}
 	}
 
