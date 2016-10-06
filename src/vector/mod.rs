@@ -1099,7 +1099,7 @@ mod tests {
 		}
 	}
 
-	// runs aribtrary largest subsequence function through test battery
+	// runs arbitrary largest subsequence function through test battery
 	fn largest_subseq_eval<F>(subseqfn: F)
 		where F: Fn(&[i32]) -> (usize, usize) {
 
