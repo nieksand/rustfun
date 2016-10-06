@@ -796,7 +796,7 @@ mod tests {
 	}
 
 	#[test]
-	fn test_fisher_yates_shuffle_smallest() {
+	fn test_fisher_yates_shuffle_two() {
 		// 1 in 2^1000 chance of getting same shuffle 1000 times
 		let mut dat = vec![1,2];
 		let mut first_ones = 0;
