@@ -335,7 +335,7 @@ fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32
     combine_chunks(dat, min, mid, max, scratch);
 }
 
-fn combine_chunks(dat: &mut [i32], lmin : usize, mid : usize, rmax : usize, scratch: &mut Vec<i32>) {
+fn combine_chunks(dat: &mut [i32], lmin: usize, mid: usize, rmax: usize, scratch: &mut Vec<i32>) {
 
     scratch.clear();
     let mut li: usize = lmin;
