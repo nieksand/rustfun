@@ -715,8 +715,7 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
  * the array.  You sweep once from left-to-right to find the largest possible
  * sum.  Then you sweep the other direction to find where that sum starts.
  *
- * Not fully sure this algo is correct.  Still need to reason through some
- * cases.
+ * -- my algorithm is wrong!  see the deep valley test on why
  */
 pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
 
