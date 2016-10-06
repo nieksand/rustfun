@@ -35,7 +35,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 
 	// randomly pick element to move to shuffled region
 	let mut rng = rand::thread_rng();
-	for _ in 0..dat.len()-2 {
+	for _ in 0..dat.len()-1 {
 		let pick = rng.gen_range(0,j);
 		dat.swap(pick,j-1);
 		j -= 1;
@@ -793,6 +793,20 @@ mod tests {
 		quick_sort(&mut v2);
 		assert!(v1 == origin, "resorted v1 missing elements");
 		assert!(v2 == origin, "resorted v2 missing elements");
+	}
+
+	#[test]
+	fn test_fisher_yates_shuffle_smallest() {
+		// 1 in 2^1000 chance of getting same shuffle 1000 times
+		let mut dat = vec![1,2];
+		let mut first_ones = 0;
+		for _ in 0..1000 {
+			fisher_yates_shuffle(&mut dat);
+			if dat[0] == 1 {
+				first_ones += 1;
+			}
+		}
+		assert!(first_ones != 1000, "dubious shuffling of two element deck")
 	}
 
 	#[test]
