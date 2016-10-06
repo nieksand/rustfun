@@ -709,7 +709,14 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 }
 
 /*
- * incomplete - sweeping O(n) longest subsequence algo.
+ * Smarter O(n) algorithm for finding largest subsequence.
+ *
+ * The basic idea is using running sums to propagate information as you sweep
+ * the array.  You sweep once from left-to-right to find the largest possible
+ * sum.  Then you sweep the other direction to find where that sum starts.
+ *
+ * Not fully sure this algo is correct.  Still need to reason through some
+ * cases.
  */
 pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
 
