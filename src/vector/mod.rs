@@ -226,7 +226,6 @@ fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
  *     parent(i)     = floor( (i-1)/2 )
  *     leftchild(i)  = 2*i+1
  *     rightchild(i) = 2*i+2
- *
  */
 pub fn make_implicit_max_heap(dat: &mut [i32]) {
     // nothing to do
@@ -528,10 +527,12 @@ pub fn binary_search(dat: &[i32], searchval: i32) -> Option<usize> {
 /*
  * Jump search.  Input must already be sorted.
  *
- * This algorithm is just for fun since it is O(sqrt(n)) versus the O(log(n)) of
- * binary search.  Conceivably it would be useful if you had a physical tape
- * that you were scanning where performance was dominated by seek rather than
- * read time.
+ * This algorithm is O(sqrt(n)) vs the O(log n) of binary search.  It can be
+ * applicable when binary search is not possible or if performance is dominated
+ * by seek rather than read time.
+ *
+ * Jump Searching: A Fast Sequential Search Technique, CACM, 21(10):831-834,
+ * October 1978.
  */
 pub fn jump_search(dat: &[i32], searchval: i32) -> Option<usize> {
     if dat.len() == 0 {
