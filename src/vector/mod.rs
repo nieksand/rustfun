@@ -52,7 +52,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * The intuition behind the algorithm is this:
  * 
  *
- * Heap, B. R. (1963). "Permutations by Interchanges" (PDF). The Computer
+ * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
 pub fn heaps_permutations(dat: &mut [i32]) {
