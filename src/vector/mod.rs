@@ -44,6 +44,22 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 }
 
 /*
+ * Heap's permutations
+ *
+ * Generates all possible permutations of a sequence.  Each iteration requires
+ * only a single swap of elements.
+ *
+ * The intuition behind the algorithm is this:
+ * 
+ *
+ * Heap, B. R. (1963). "Permutations by Interchanges" (PDF). The Computer
+ * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
+ */
+pub fn heaps_permutations(dat: &mut [i32]) {
+	// not yet implemented
+}
+
+/*
  * Boyer-Moore majority vote algorithm.
  *
  * Indicates which element has a strict majority--that is more occurrences than
