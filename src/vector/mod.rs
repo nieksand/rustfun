@@ -56,7 +56,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
 pub fn heaps_permutations(dat: &mut [i32]) {
-	// not yet implemented
+    // not yet implemented
 }
 
 /*
@@ -125,23 +125,23 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
  * and has memory usage proportional to the number of distinct candidates.  
  */
 pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
-	// sum votes for each candidate
-	let mut counts = HashMap::new();
-	for v in dat {
-		let cnt = counts.entry(v).or_insert(0);
-		*cnt += 1;
-	}
+    // sum votes for each candidate
+    let mut counts = HashMap::new();
+    for v in dat {
+        let cnt = counts.entry(v).or_insert(0);
+        *cnt += 1;
+    }
 
-	// check tallies for majority holder
+    // check tallies for majority holder
     let threshold: i64 = (dat.len() as i64) / 2;
-	for (v, cnt) in counts {
-		if cnt > threshold {
-			return Some(*v);
-		}
-	}
+    for (v, cnt) in counts {
+        if cnt > threshold {
+            return Some(*v);
+        }
+    }
 
     // no strict majority existed
-	return None;
+    return None;
 }
 
 /*
@@ -847,9 +847,9 @@ mod tests {
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
 
-	// runs arbitrary majority vote function through test battery 
-	fn majority_eval<F>(majorityfn: F)
-		where F: Fn(&[i32]) -> Option<i32> {
+    // runs arbitrary majority vote function through test battery 
+    fn majority_eval<F>(majorityfn: F)
+        where F: Fn(&[i32]) -> Option<i32> {
         // majority of 1s
         let v1 = vec![0,1,0,1,1];
         let m1 = majorityfn(&v1);
@@ -874,16 +874,16 @@ mod tests {
         let v5 = vec![6];
         let m5 = majorityfn(&v5);
         assert!(m5 == Some(6));
-	}
+    }
 
     #[test]
     fn test_bm_majority_vote() {
-		majority_eval(bm_majority_vote);
+        majority_eval(bm_majority_vote);
     }
 
     #[test]
     fn test_hash_majority_vote() {
-		majority_eval(hash_majority_vote);
+        majority_eval(hash_majority_vote);
     }
 
     #[test]
@@ -1008,36 +1008,36 @@ mod tests {
         sort_eval(6, bogo_sort);
     }
 
-	// runs arbitrary selection function through test battery
-	fn select_eval<F>(selectfn: F)
-		where F: Fn(&mut [i32], usize) -> i32 {
+    // runs arbitrary selection function through test battery
+    fn select_eval<F>(selectfn: F)
+        where F: Fn(&mut [i32], usize) -> i32 {
 
-		// ensure correct selection of each element
+        // ensure correct selection of each element
         let mut dat: Vec<i32> = (0..100).collect();
         fisher_yates_shuffle(&mut dat);
 
-		for i in 0..dat.len() {
-			let kval = selectfn(&mut dat, i);
-			assert!(kval == (i as i32), "select did not pick correct element");
-		}
+        for i in 0..dat.len() {
+            let kval = selectfn(&mut dat, i);
+            assert!(kval == (i as i32), "select did not pick correct element");
+        }
 
-		// test single element degenerate case
+        // test single element degenerate case
         let mut v1: Vec<i32> = vec![42];
         assert!(selectfn(&mut v1, 0) == 42);
-	}
+    }
 
     #[test]
     fn test_naive_select() {
-		select_eval(naive_select);
+        select_eval(naive_select);
     }
 
     #[test]
     fn test_quick_select() {
-		select_eval(quick_select);
+        select_eval(quick_select);
     }
 
-	fn search_eval<F>(searchfn: F)
-		where F: Fn(&[i32], i32) -> Option<usize> {
+    fn search_eval<F>(searchfn: F)
+        where F: Fn(&[i32], i32) -> Option<usize> {
 
         // search over arrays of different sizes
         for n in 1..101 as usize {
@@ -1060,21 +1060,21 @@ mod tests {
         let degen: Vec<i32> = vec![];
         let dres = searchfn(&degen, 100);
         assert!(dres == None);
-	}
+    }
 
     #[test]
     fn test_binary_search() {
-		search_eval(binary_search);
+        search_eval(binary_search);
     }
 
     #[test]
     fn test_jump_search() {
-		search_eval(jump_search);
+        search_eval(jump_search);
     }
 
     #[test]
     fn test_interpolation_search() {
-		search_eval(interpolation_search);
+        search_eval(interpolation_search);
     }
 
     #[test]
