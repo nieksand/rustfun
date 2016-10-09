@@ -102,15 +102,13 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
  * Hash table majority vote algorithm.
  *
  * Indicates which element has a strict majority--that is more occurrences than
- * all other elements combined.  
- *
- * The result is None if no strict majority element exists.
+ * all other elements combined.  The result is None if no strict majority
+ * element exists.
  *
  * It is linear time assuming no pathological hash behavior (1 pass over data)
  * and has memory usage proportional to the number of distinct candidates.  
  */
 pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
-
 	// sum votes for each candidate
 	let mut counts = HashMap::new();
 	for v in dat {
@@ -172,7 +170,10 @@ pub fn partition(dat: &mut [i32]) -> usize {
 /*
  * Quicksort with random pivoting.
  *
- * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * Average case performance of O(n log n) with worst case O(n^2).  Using random
+ * pivot selection makes worst case extremely unlikely.
+ *
+ * This is a pure implementation that does not switch to a non-recursive sort on
  * small partition sizes.
  */
 pub fn quick_sort(dat: &mut [i32]) {
@@ -197,6 +198,195 @@ fn quick_sort_int(dat: &mut [i32], min: usize, max: usize) {
     quick_sort_int(dat, min, pidx);
     quick_sort_int(dat, pidx+1, max);
 }
+
+/*
+ * Make array an implicit binary max-heap data structure.
+ *
+ * The max-heap enforces that each node is GTE to its children and that the tree
+ * is complete.
+ *
+ * The implicit part comes from packing the tree into an array with the
+ * following index scheme:
+ *
+ *     root is at 0
+ *     parent(i)     = floor( (i-1)/2 )
+ *     leftchild(i)  = 2*i+1
+ *     rightchild(i) = 2*i+2
+ *
+ * The construction process has linear time complexity, but that is not at all
+ * obvious from the code.  A good explanation is here:
+ *
+ *    http://stackoverflow.com/questions/9755721/
+ */
+pub fn make_implicit_max_heap(dat: &mut [i32]) {
+    // nothing to do
+    if dat.len() < 2 {
+        return;
+    }
+
+    fn parent_idx(node_idx: usize) -> usize {
+        return (node_idx-1)/2;
+    }
+
+    // start by establishing heap property on far-right subtree
+    // sweep there to begin of array, inclusive
+    let end = dat.len();
+    let far_right = parent_idx(end-1);
+    for i in 0..far_right+1 {
+        let root_idx = far_right - i;
+        sift_down(&mut dat[..], root_idx);
+    }
+}
+
+fn sift_down(dat: &mut [i32], start: usize) {
+    fn left_child_idx(node_idx: usize) -> usize {
+        return 2*node_idx+1;
+    }
+
+    // element may violate heap property; rest of array must be valid
+    let mut wiggle_idx = start;
+
+    // swap wiggle element downwards with largest child until heap property
+    // re-established
+    while left_child_idx(wiggle_idx) < dat.len() {
+
+        let mut swap_target = wiggle_idx;
+
+        let left_idx = left_child_idx(wiggle_idx);
+        let right_idx = left_idx + 1;
+
+        // loop condition ensures child exists
+        if dat[left_idx] > dat[wiggle_idx] {
+            swap_target = left_idx;
+        }
+
+        // right child greater than wiggle and left child
+        if right_idx < dat.len() && dat[right_idx] > dat[swap_target] {
+            swap_target = right_idx;
+        }
+
+        // heap property was established!
+        if swap_target == wiggle_idx {
+            return;
+        }
+
+        dat.swap(wiggle_idx, swap_target);
+        wiggle_idx = swap_target;
+    }
+}
+
+/*
+ * Heap sort.
+ *
+ * This has O(n log n) time complexity and constant space complexity.  Note that
+ * heap construction is called once O(n) and sift_down is invoked n times with
+ * O(log n) complexity.  Hence, O(n + n log n) = O(n log n).
+ */
+pub fn heap_sort(dat: &mut [i32]) {
+    // nothing to do
+    if dat.len() < 2 {
+        return;
+    }
+
+    make_implicit_max_heap(dat);
+
+    // swap top of heap (max val) to sorted region being built at end
+    // reestablish heap property by shifting down the element we swapped
+    // inwards.
+    let len = dat.len();
+    for i in 0..len {
+        dat.swap(0, len-i-1);
+        sift_down(&mut dat[0..len-i-1], 0);
+    }
+}
+
+/*
+ * Merge sequential sorted runs.
+ *
+ * Takes two sorted sequences (runs) and combines them to a single sorted
+ * sequence.
+ *
+ * Uses a scratch array to hold the intermediate output.  Scratch size consumed
+ * equals the sum of the two run lengths.  The sequential constraint makes both
+ * the interface and implementation a bit simpler, but isn't strictly speaking
+ * necessary.
+ */
+fn merge_sequential_runs(dat: &mut [i32], lmin: usize, mid: usize, rmax: usize, scratch: &mut Vec<i32>) {
+
+    scratch.clear();
+    let mut li: usize = lmin;
+    let mut ri: usize = mid;
+
+    // merge two sorted lists
+    while li < mid && ri < rmax {
+        if dat[li] < dat[ri] {
+            scratch.push(dat[li]);
+            li += 1;
+        } else {
+            scratch.push(dat[ri]);
+            ri += 1;
+        }
+    }
+
+    // drain remainder
+    if li < mid {
+        scratch.extend_from_slice(&dat[li..mid]);
+    } else if ri < rmax {
+        scratch.extend_from_slice(&dat[ri..rmax]);
+    }
+
+    // scratch back to output
+    dat[lmin..rmax].clone_from_slice(scratch);
+}
+
+
+
+
+/*
+ * Merge sort.  This is a top-down implementation.
+ *
+ * Kept it as a pure implementation; does not switch to a non-recursive sort at
+ * small partition sizes.
+ */
+pub fn merge_sort(dat: &mut [i32]) {
+    // requires O(n) scratch space
+    let mut scratch: Vec<i32> = Vec::with_capacity(dat.len());
+    let max = dat.len();
+    merge_sort_int(dat, 0, max, &mut scratch);
+}
+
+fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32>) {
+
+    // empty and single-element list already sorted
+    if max - min < 2 {
+        return;
+    }
+
+    // split in two and sort each chunk
+    let mid = min + (max-min)/2;
+    merge_sort_int(dat, min, mid, scratch);
+    merge_sort_int(dat, mid, max, scratch);
+
+    // combine sorted chunks
+    merge_sequential_runs(dat, min, mid, max, scratch);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /*
  * Naive method for selecting k-th smallest element.
@@ -249,150 +439,6 @@ fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
     } else {
         return;
     }
-}
-
-/*
- * Make implicit binary max-heap data structure.
- *
- * Uses following packing scheme to map heap elements to array:
- *     root is at 0
- *     parent(i)     = floor( (i-1)/2 )
- *     leftchild(i)  = 2*i+1
- *     rightchild(i) = 2*i+2
- */
-pub fn make_implicit_max_heap(dat: &mut [i32]) {
-    // nothing to do
-    if dat.len() < 2 {
-        return;
-    }
-
-    fn parent_idx(node_idx: usize) -> usize {
-        return (node_idx-1)/2;
-    }
-
-    // start by establish heap property on far-right subtree
-    // sweep there to begin of array, inclusive
-    let end = dat.len();
-    let far_right = parent_idx(end-1);
-    for i in 0..far_right+1 {
-        let root_idx = far_right - i;
-        sift_down(&mut dat[..], root_idx);
-    }
-}
-
-fn sift_down(dat: &mut [i32], start: usize) {
-    fn left_child_idx(node_idx: usize) -> usize {
-        return 2*node_idx+1;
-    }
-
-    // element may violate heap property; rest of array must be valid
-    let mut wiggle_idx = start;
-
-    // swap wiggle element downwards with largest child until heap property
-    // re-established
-    while left_child_idx(wiggle_idx) < dat.len() {
-
-        let mut swap_target = wiggle_idx;
-
-        let left_idx = left_child_idx(wiggle_idx);
-        let right_idx = left_idx + 1;
-
-        // loop condition ensures child exists
-        if dat[left_idx] > dat[wiggle_idx] {
-            swap_target = left_idx;
-        }
-
-        // right child greater than wiggle and left child
-        if right_idx < dat.len() && dat[right_idx] > dat[swap_target] {
-            swap_target = right_idx;
-        }
-
-        // heap property was established!
-        if swap_target == wiggle_idx {
-            return;
-        }
-
-        dat.swap(wiggle_idx, swap_target);
-        wiggle_idx = swap_target;
-    }
-}
-
-/*
- * Heap sort.
- */
-pub fn heap_sort(dat: &mut [i32]) {
-    // nothing to do
-    if dat.len() < 2 {
-        return;
-    }
-
-    make_implicit_max_heap(dat);
-
-    // swap top of heap (max val) to sorted region being built at end
-    // reestablish heap property by shifting down the element we swapped
-    // inwards.
-    let len = dat.len();
-    for i in 0..len {
-        dat.swap(0, len-i-1);
-        sift_down(&mut dat[0..len-i-1], 0);
-    }
-}
-
-/*
- * Merge sort.  This is a top-down implementation.
- *
- * Kept it as a pure implementation; does not switch to a non-recursive sort at
- * small partition sizes.
- */
-pub fn merge_sort(dat: &mut [i32]) {
-    // requires O(n) scratch space
-    let mut scratch: Vec<i32> = Vec::with_capacity(dat.len());
-    let max = dat.len();
-    merge_sort_int(dat, 0, max, &mut scratch);
-}
-
-fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32>) {
-
-    // empty and single-element list already sorted
-    if max - min < 2 {
-        return;
-    }
-
-    // split in two and sort each chunk
-    let mid = min + (max-min)/2;
-    merge_sort_int(dat, min, mid, scratch);
-    merge_sort_int(dat, mid, max, scratch);
-
-    // combine sorted chunks
-    sequential_merge(dat, min, mid, max, scratch);
-}
-
-fn sequential_merge(dat: &mut [i32], lmin: usize, mid: usize, rmax: usize, scratch: &mut Vec<i32>) {
-
-    scratch.clear();
-    let mut li: usize = lmin;
-    let mut ri: usize = mid;
-
-    // merge two sorted lists
-    while li < mid && ri < rmax {
-        if dat[li] < dat[ri] {
-            scratch.push(dat[li]);
-            li += 1;
-        } else {
-            scratch.push(dat[ri]);
-            ri += 1;
-        }
-    }
-
-    // drain remainder
-    if li < mid {
-        scratch.extend_from_slice(&dat[li..mid]);
-    } else if ri < rmax {
-        scratch.extend_from_slice(&dat[ri..rmax]);
-    }
-
-    // scratch back to output
-    dat[lmin..rmax].clone_from_slice(scratch);
 }
 
 /*
@@ -879,31 +925,6 @@ mod tests {
 		majority_eval(hash_majority_vote);
     }
 
-
-
-
-
-
-
-
-    // runs arbitrary sort function through test battery
-    fn sort_eval<F>(randsize: i32, sortfn: F)
-        // decently sized random vector
-        where F: Fn(&mut [i32]) -> () {
-        let mut dat: Vec<i32> = (0..randsize).collect();
-        fisher_yates_shuffle(&mut dat);
-        sortfn(&mut dat);
-        assert!(is_sorted(&dat), "result not properly sorted");
-
-        // try degenerate and small cases
-        for n in 0..6 {
-            dat = (0..n).collect();
-            fisher_yates_shuffle(&mut dat);
-            sortfn(&mut dat);
-            assert!(is_sorted(&dat), "result not properly sorted");
-        }
-    }
-
     #[test]
     fn test_partition() {
         fn left_ok(dat: &Vec<i32>, bound: i32, min: usize, max: usize) -> bool {
@@ -952,10 +973,56 @@ mod tests {
         assert!(right_ok(&v4, 42, p4+1, 1), "right partition invalid");
     }
 
+    // runs arbitrary sort function through test battery
+    fn sort_eval<F>(randsize: i32, sortfn: F)
+        // decently sized random vector
+        where F: Fn(&mut [i32]) -> () {
+        let mut dat: Vec<i32> = (0..randsize).collect();
+        fisher_yates_shuffle(&mut dat);
+        sortfn(&mut dat);
+        assert!(is_sorted(&dat), "result not properly sorted");
+
+        // try degenerate and small cases
+        for n in 0..6 {
+            dat = (0..n).collect();
+            fisher_yates_shuffle(&mut dat);
+            sortfn(&mut dat);
+            assert!(is_sorted(&dat), "result not properly sorted");
+        }
+    }
+
     #[test]
     fn test_quick_sort() {
         sort_eval(5000, quick_sort);
     }
+
+    #[test]
+    fn test_make_implicit_max_heap() {
+        // try degenerate and balanced/unbalanced cases
+        for n in 0..10 {
+            let mut dat: Vec<i32> = (0..n).collect();
+            make_implicit_max_heap(&mut dat);
+
+            // verify heap property, parent >= child
+            for i in 1..dat.len() {
+                let parent_idx = (i-1)/2;
+                assert!(dat[parent_idx] >= dat[i], "max heap property violated");
+            }
+        }
+    }
+
+    #[test]
+    fn test_heap_sort() {
+        sort_eval(5000, heap_sort);
+    }
+
+
+
+
+
+
+
+
 
     #[test]
     fn test_naive_select() {
@@ -985,26 +1052,6 @@ mod tests {
     fn test_quick_select_degenerate() {
         let mut v1: Vec<i32> = vec![42];
         assert!(quick_select(&mut v1, 0) == 42);
-    }
-
-    #[test]
-    fn test_make_implicit_max_heap() {
-        // try degenerate and balanced/unbalanced cases
-        for n in 0..10 {
-            let mut dat: Vec<i32> = (0..n).collect();
-            make_implicit_max_heap(&mut dat);
-
-            // verify heap property, parent >= child
-            for i in 1..dat.len() {
-                let parent_idx = (i-1)/2;
-                assert!(dat[parent_idx] >= dat[i], "max heap property violated");
-            }
-        }
-    }
-
-    #[test]
-    fn test_heap_sort() {
-        sort_eval(5000, heap_sort);
     }
 
     #[test]
