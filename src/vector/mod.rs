@@ -19,6 +19,8 @@
 extern crate rand;
 
 use self::rand::Rng;
+use std::collections::HashMap;
+
 
 
 /*
@@ -95,6 +97,38 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
 
     // no strict majority existed
     return None;
+}
+
+/*
+ * Hash table majority vote algorithm.
+ *
+ * Indicates which element has a strict majority--that is more occurrences than
+ * all other elements combined.  
+ *
+ * The result is None if no strict majority element exists.
+ *
+ * It is linear time assuming no pathological hash behavior (1 pass over data)
+ * and has memory usage proportional to the number of distinct candidates.  
+ */
+pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
+
+	// sum votes for each candidate
+	let mut counts = HashMap::new();
+	for v in dat {
+		let cnt = counts.entry(v).or_insert(0);
+		*cnt += 1;
+	}
+
+	// check tallies for majority holder
+    let threshold: i64 = (dat.len() as i64) / 2;
+	for (v, cnt) in counts {
+		if cnt > threshold {
+			return Some(*v);
+		}
+	}
+
+    // no strict majority existed
+	return None;
 }
 
 /*
@@ -774,6 +808,35 @@ mod tests {
         }
     }
 
+	// runs arbitrary majority vote function through test battery 
+	fn majority_eval<F>(majorityfn: F)
+		where F: Fn(&[i32]) -> Option<i32> {
+        // majority of 1s
+        let v1 = vec![0,1,0,1,1];
+        let m1 = majorityfn(&v1);
+        assert!(m1 == Some(1));
+
+        // no majority
+        let v2 = vec![0,1,0,1,1,0];
+        let m2 = majorityfn(&v2);
+        assert!(m2 == None);
+
+        // majority of 1s but not strict majority
+        let v3 = vec![2,2,0,1,0,1,1];
+        let m3 = majorityfn(&v3);
+        assert!(m3 == None);
+
+        // empty input
+        let v4 = vec![];
+        let m4 = majorityfn(&v4);
+        assert!(m4 == None);
+
+        // lonely majority
+        let v5 = vec![6];
+        let m5 = majorityfn(&v5);
+        assert!(m5 == Some(6));
+	}
+
     #[test]
     fn test_fisher_yates_shuffle() {
         // start with identical sequences
@@ -827,30 +890,12 @@ mod tests {
 
     #[test]
     fn test_bm_majority_vote() {
-        // majority of 1s
-        let v1 = vec![0,1,0,1,1];
-        let m1 = bm_majority_vote(&v1);
-        assert!(m1 == Some(1));
+		majority_eval(bm_majority_vote);
+    }
 
-        // no majority
-        let v2 = vec![0,1,0,1,1,0];
-        let m2 = bm_majority_vote(&v2);
-        assert!(m2 == None);
-
-        // majority of 1s but not strict majority
-        let v3 = vec![2,2,0,1,0,1,1];
-        let m3 = bm_majority_vote(&v3);
-        assert!(m3 == None);
-
-        // empty input
-        let v4 = vec![];
-        let m4 = bm_majority_vote(&v4);
-        assert!(m4 == None);
-
-        // lonely majority
-        let v5 = vec![6];
-        let m5 = bm_majority_vote(&v5);
-        assert!(m5 == Some(6));
+    #[test]
+    fn test_hash_majority_vote() {
+		majority_eval(hash_majority_vote);
     }
 
     #[test]
