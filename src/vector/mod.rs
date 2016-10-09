@@ -22,7 +22,6 @@ use self::rand::Rng;
 use std::collections::HashMap;
 
 
-
 /*
  * Randomly shuffle vector using Durstenfeld's variant of Fisher-Yates.
  */
@@ -790,53 +789,6 @@ pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
 mod tests {
     use super::*;
 
-    // runs arbitrary sort function through test battery
-    fn sort_eval<F>(randsize: i32, sortfn: F)
-        // decently sized random vector
-        where F: Fn(&mut [i32]) -> () {
-        let mut dat: Vec<i32> = (0..randsize).collect();
-        fisher_yates_shuffle(&mut dat);
-        sortfn(&mut dat);
-        assert!(is_sorted(&dat), "result not properly sorted");
-
-        // try degenerate and small cases
-        for n in 0..6 {
-            dat = (0..n).collect();
-            fisher_yates_shuffle(&mut dat);
-            sortfn(&mut dat);
-            assert!(is_sorted(&dat), "result not properly sorted");
-        }
-    }
-
-	// runs arbitrary majority vote function through test battery 
-	fn majority_eval<F>(majorityfn: F)
-		where F: Fn(&[i32]) -> Option<i32> {
-        // majority of 1s
-        let v1 = vec![0,1,0,1,1];
-        let m1 = majorityfn(&v1);
-        assert!(m1 == Some(1));
-
-        // no majority
-        let v2 = vec![0,1,0,1,1,0];
-        let m2 = majorityfn(&v2);
-        assert!(m2 == None);
-
-        // majority of 1s but not strict majority
-        let v3 = vec![2,2,0,1,0,1,1];
-        let m3 = majorityfn(&v3);
-        assert!(m3 == None);
-
-        // empty input
-        let v4 = vec![];
-        let m4 = majorityfn(&v4);
-        assert!(m4 == None);
-
-        // lonely majority
-        let v5 = vec![6];
-        let m5 = majorityfn(&v5);
-        assert!(m5 == Some(6));
-	}
-
     #[test]
     fn test_fisher_yates_shuffle() {
         // start with identical sequences
@@ -888,6 +840,35 @@ mod tests {
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
 
+	// runs arbitrary majority vote function through test battery 
+	fn majority_eval<F>(majorityfn: F)
+		where F: Fn(&[i32]) -> Option<i32> {
+        // majority of 1s
+        let v1 = vec![0,1,0,1,1];
+        let m1 = majorityfn(&v1);
+        assert!(m1 == Some(1));
+
+        // no majority
+        let v2 = vec![0,1,0,1,1,0];
+        let m2 = majorityfn(&v2);
+        assert!(m2 == None);
+
+        // majority of 1s but not strict majority
+        let v3 = vec![2,2,0,1,0,1,1];
+        let m3 = majorityfn(&v3);
+        assert!(m3 == None);
+
+        // empty input
+        let v4 = vec![];
+        let m4 = majorityfn(&v4);
+        assert!(m4 == None);
+
+        // lonely majority
+        let v5 = vec![6];
+        let m5 = majorityfn(&v5);
+        assert!(m5 == Some(6));
+	}
+
     #[test]
     fn test_bm_majority_vote() {
 		majority_eval(bm_majority_vote);
@@ -896,6 +877,31 @@ mod tests {
     #[test]
     fn test_hash_majority_vote() {
 		majority_eval(hash_majority_vote);
+    }
+
+
+
+
+
+
+
+
+    // runs arbitrary sort function through test battery
+    fn sort_eval<F>(randsize: i32, sortfn: F)
+        // decently sized random vector
+        where F: Fn(&mut [i32]) -> () {
+        let mut dat: Vec<i32> = (0..randsize).collect();
+        fisher_yates_shuffle(&mut dat);
+        sortfn(&mut dat);
+        assert!(is_sorted(&dat), "result not properly sorted");
+
+        // try degenerate and small cases
+        for n in 0..6 {
+            dat = (0..n).collect();
+            fisher_yates_shuffle(&mut dat);
+            sortfn(&mut dat);
+            assert!(is_sorted(&dat), "result not properly sorted");
+        }
     }
 
     #[test]
