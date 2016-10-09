@@ -56,14 +56,14 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * - assume you have method to permute an n-1 element array
  *
  * - generate permutation for n element array by holding nth element fixed and
- *   permuting n-1 elements.  Then swap n and one of n-1 and permute again. 
- *   Repeat this process until each of the n-1th elements has held the nth 
+ *   permuting n-1 elements.  Then swap n and one of n-1 and permute again.
+ *   Repeat this process until each of the n-1th elements has held the nth
  *   position.
  *
  * A direct implementation leads to a very understandable algorithm.  Generate
  * permutations using the nth element as-is.  Then looping with i=0..upto_idx:
  * swap the ith and upto_idx values, generate permutations, swap ith and
- * upto_idx values back.  
+ * upto_idx values back.
  *
  * The version of this algorithm you find in the paper and wikipedia avoid the
  * swap-back operation by branching instead on odd/even permutation indices.
@@ -72,35 +72,35 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
 pub fn heaps_permutations(dat: &mut [i32]) {
-	print!("\n");
+    print!("\n");
     let upto_idx = dat.len()-1;
-	heaps_permutations_int(dat, upto_idx)
+    heaps_permutations_int(dat, upto_idx)
 }
 
 fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize) {
-	// permuting up to index 0 (inclusive) is base case
-	if upto_idx == 0 {
-		print!("meow: {:?}\n", dat);
-		return;
-	}
+    // permuting up to index 0 (inclusive) is base case
+    if upto_idx == 0 {
+        print!("meow: {:?}\n", dat);
+        return;
+    }
 
-	// generate permutations given last element
-	heaps_permutations_int(dat, upto_idx-1);
+    // generate permutations given last element
+    heaps_permutations_int(dat, upto_idx-1);
 
-	// swap from n-1th to nth, generate permutations
-	for i in 0..upto_idx {
-		// swap in
-		let t = dat[i];
-		dat[i] = dat[upto_idx];
-		dat[upto_idx] = t;
+    // swap from n-1th to nth, generate permutations
+    for i in 0..upto_idx {
+        // swap in
+        let t = dat[i];
+        dat[i] = dat[upto_idx];
+        dat[upto_idx] = t;
 
-		heaps_permutations_int(dat, upto_idx-1);
+        heaps_permutations_int(dat, upto_idx-1);
 
-		// swap out
-		let t = dat[i];
-		dat[i] = dat[upto_idx];
-		dat[upto_idx] = t;
-	}
+        // swap out
+        let t = dat[i];
+        dat[i] = dat[upto_idx];
+        dat[upto_idx] = t;
+    }
 }
 
 /*
@@ -166,7 +166,7 @@ pub fn bm_majority_vote(dat: &[i32]) -> Option<i32> {
  * element exists.
  *
  * It is linear time assuming no pathological hash behavior (1 pass over data)
- * and has memory usage proportional to the number of distinct candidates.  
+ * and has memory usage proportional to the number of distinct candidates.
  */
 pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
     // sum votes for each candidate
@@ -400,7 +400,7 @@ fn merge_sequential_runs(dat: &mut [i32], lmin: usize, mid: usize, rmax: usize, 
 }
 
 /*
- * Merge sort.  
+ * Merge sort.
  *
  * This is a top-down implementation.  It has O(n log n) time complexity and
  * O(n) space complexity.
@@ -807,7 +807,7 @@ pub fn dedupe(dat: &mut Vec<i32>) {
 /*
  * Naive O(n^2) algorithm for finding largest subsequence.
  *
- * Enumerates all possible subsequences and returns longest one. 
+ * Enumerates all possible subsequences and returns longest one.
  */
 pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 
@@ -831,7 +831,7 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
             }
         }
     }
-    
+
     (lidx, ridx)
 }
 
@@ -891,14 +891,14 @@ mod tests {
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
 
-	#[test]
-	fn test_heaps_permutations() {
-		let mut vals = vec![1,2,3];
-		heaps_permutations(&mut vals);
-		assert!(true == false);
-	}
+    #[test]
+    fn test_heaps_permutations() {
+        let mut vals = vec![1,2,3];
+        heaps_permutations(&mut vals);
+        assert!(true == false);
+    }
 
-    // runs arbitrary majority vote function through test battery 
+    // runs arbitrary majority vote function through test battery
     fn majority_eval<F>(majorityfn: F)
         where F: Fn(&[i32]) -> Option<i32> {
         // majority of 1s
