@@ -503,27 +503,11 @@ pub fn bogo_sort(dat: &mut [i32]) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*
  * Naive method for selecting k-th smallest element.
  *
- * Just sorts and grabs.
+ * Just sorts and grabs, so it inherits its time and space complexity from the
+ * underlying sort.
  */
 pub fn naive_select(dat: &mut [i32], k: usize) -> i32 {
     assert!(k < dat.len(), "k-th element not in data bounds");
@@ -541,6 +525,9 @@ pub fn naive_select(dat: &mut [i32], k: usize) -> i32 {
  * pivot will be placed in the correct, final location.  So each time you check
  * where the kth element falls relative to the pivot and only recurse on that
  * side.  You stop once the pivot=kth element.
+ *
+ * Average case time complexity is O(n) but like quicksort it has the worst case
+ * of O(n^2).
  */
 pub fn quick_select(dat: &mut [i32], k: usize) -> i32 {
     assert!(k < dat.len(), "k-th element not in data bounds");
@@ -572,13 +559,6 @@ fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
         return;
     }
 }
-
-
-
-
-
-
-
 
 /*
  * Binary search.  Input must already be sorted.
@@ -688,8 +668,6 @@ pub fn interpolation_search(dat: &[i32], searchval: i32) -> Option<usize> {
     // [min,max) now empty range, value can not exist
     return None;
 }
-
-
 
 /*
  * Verify if vector is sorted.
@@ -942,8 +920,9 @@ mod tests {
 
     // runs arbitrary sort function through test battery
     fn sort_eval<F>(randsize: i32, sortfn: F)
-        // decently sized random vector
         where F: Fn(&mut [i32]) -> () {
+
+        // decently sized random vector
         let mut dat: Vec<i32> = (0..randsize).collect();
         fisher_yates_shuffle(&mut dat);
         sortfn(&mut dat);
@@ -1013,97 +992,73 @@ mod tests {
         sort_eval(6, bogo_sort);
     }
 
+	// runs arbitrary selection function through test battery
+	fn select_eval<F>(selectfn: F)
+		where F: Fn(&mut [i32], usize) -> i32 {
 
-
-
-
-
-
-
-
-    #[test]
-    fn test_naive_select() {
+		// ensure correct selection of each element
         let mut dat: Vec<i32> = (0..100).collect();
         fisher_yates_shuffle(&mut dat);
 
-        let k10 = naive_select(&mut dat, 10);
-        assert!(k10 == 10, "naive select did not pick 10th element");
+		for i in 0..dat.len() {
+			let kval = selectfn(&mut dat, i);
+			assert!(kval == (i as i32), "select did not pick correct element");
+		}
 
-        let k99 = naive_select(&mut dat, 99);
-        assert!(k99 == 99, "naive select did not pick 99th element");
+		// test single element degenerate case
+        let mut v1: Vec<i32> = vec![42];
+        assert!(selectfn(&mut v1, 0) == 42);
+	}
+
+    #[test]
+    fn test_naive_select() {
+		select_eval(naive_select);
     }
 
     #[test]
     fn test_quick_select() {
-        let mut dat: Vec<i32> = (0..100).collect();
-        fisher_yates_shuffle(&mut dat);
-
-        let k10 = quick_select(&mut dat, 10);
-        assert!(k10 == 10, "qselect did not pick 10th element");
-
-        let k99 = quick_select(&mut dat, 99);
-        assert!(k99 == 99, "qselect did not pick 99th element");
+		select_eval(quick_select);
     }
 
-    #[test]
-    fn test_quick_select_degenerate() {
-        let mut v1: Vec<i32> = vec![42];
-        assert!(quick_select(&mut v1, 0) == 42);
-    }
+	fn search_eval<F>(searchfn: F)
+		where F: Fn(&[i32], i32) -> Option<usize> {
 
-    #[test]
-    fn test_binary_search() {
-        let dat: Vec<i32> = (0..10).collect();
-        for i in 0..dat.len() {
-            let res = binary_search(&dat, dat[i]);
-            assert!(res == Some(i), "binary search should have hit");
-        }
-
-        let r1 = binary_search(&dat, -1);
-        assert!(r1 == None, "binary search should have missed");
-
-        let r2 = binary_search(&dat, 1000);
-        assert!(r2 == None, "binary search should have missed");
-    }
-
-    #[test]
-    fn test_jump_search() {
-        // jump over arrays of different sizes
+        // search over arrays of different sizes
         for n in 1..101 as usize {
             // make sure we can hit every value inside
             let dat: Vec<i32> = (0..n as i32).collect();
             for i in 0..n {
-                let res = jump_search(&dat, dat[i]);
+                let res = searchfn(&dat, dat[i]);
                 assert!(res == Some(i), "jump search should have hit");
             }
 
             // miss on purpose
-            let r1 = jump_search(&dat, -1);
+            let r1 = searchfn(&dat, -1);
             assert!(r1 == None, "jump search should have missed");
 
-            let r2 = jump_search(&dat, 1000);
+            let r2 = searchfn(&dat, 1000);
             assert!(r2 == None, "jump search should have missed");
         }
 
         // degenerate case
         let degen: Vec<i32> = vec![];
-        let dres = jump_search(&degen, 100);
+        let dres = searchfn(&degen, 100);
         assert!(dres == None);
+	}
+
+    #[test]
+    fn test_binary_search() {
+		search_eval(binary_search);
+    }
+
+    #[test]
+    fn test_jump_search() {
+		search_eval(jump_search);
     }
 
     #[test]
     fn test_interpolation_search() {
-        let dat: Vec<i32> = (0..10).collect();
-        for i in 0..dat.len() {
-            let res = interpolation_search(&dat, dat[i]);
-            assert!(res == Some(i), "interpolation search should have hit");
-        }
-
-        let r1 = interpolation_search(&dat, -1);
-        assert!(r1 == None, "interpolation search should have missed");
-
-        let r2 = interpolation_search(&dat, 1000);
-        assert!(r2 == None, "interpolation search should have missed");
+		search_eval(interpolation_search);
     }
 
     #[test]
