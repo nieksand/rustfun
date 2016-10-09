@@ -572,7 +572,7 @@ pub fn binary_search(dat: &[i32], searchval: i32) -> Option<usize> {
     let mut min = 0;
     let mut max = dat.len();
     while min < max {
-        let mid = (max+min)/2;
+        let mid = min + (max-min)/2;
 
         // excluded [mid, max) so search [min,mid)
         if dat[mid] > searchval {
