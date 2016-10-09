@@ -339,11 +339,11 @@ fn merge_sequential_runs(dat: &mut [i32], lmin: usize, mid: usize, rmax: usize, 
     dat[lmin..rmax].clone_from_slice(scratch);
 }
 
-
-
-
 /*
- * Merge sort.  This is a top-down implementation.
+ * Merge sort.  
+ *
+ * This is a top-down implementation.  It has O(n log n) time complexity and
+ * O(n) space complexity.
  *
  * Kept it as a pure implementation; does not switch to a non-recursive sort at
  * small partition sizes.
@@ -369,76 +369,6 @@ fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32
 
     // combine sorted chunks
     merge_sequential_runs(dat, min, mid, max, scratch);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
- * Naive method for selecting k-th smallest element.
- *
- * Just sorts and grabs.
- */
-pub fn naive_select(dat: &mut [i32], k: usize) -> i32 {
-    assert!(k < dat.len(), "k-th element not in data bounds");
-    quick_sort(dat);
-    dat[k]
-}
-
-/*
- * Quickselect with random pivoting.
- *
- * This picks the k-th smallest element from values in the array.
- *
- * Algorithm has same basic idea of quicksort, but you don't have to fully sort
- * the array.  Instead observe that each partition sweep guarantees that the
- * pivot will be placed in the correct, final location.  So each time you check
- * where the kth element falls relative to the pivot and only recurse on that
- * side.  You stop once the pivot=kth element.
- */
-pub fn quick_select(dat: &mut [i32], k: usize) -> i32 {
-    assert!(k < dat.len(), "k-th element not in data bounds");
-
-    let max = dat.len();
-    quick_select_int(dat, 0, max, k);
-    dat[k]
-}
-
-fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
-    assert!(min <= max, "qselect min extent gt max extent");
-    assert!(max <= dat.len(), "qselect max extent gt vector len");
-
-    // recursion base case
-    if max - min < 2 {
-        return;
-    }
-
-    // random pivot
-    dat.swap(min, rand::thread_rng().gen_range(min, max));
-    let pidx = partition(&mut dat[min..max]) + min;
-
-    // process only subpartition needed to position kth element
-    if k < pidx {
-        quick_select_int(dat, min, pidx, k);
-    } else if k > pidx {
-        quick_select_int(dat, pidx+1, max, k);
-    } else {
-        return;
-    }
 }
 
 /*
@@ -495,7 +425,9 @@ pub fn selection_sort(dat: &mut [i32]) {
  * Shaker sort.  Just for fun.
  *
  * This is a variant of bubble sort mentioned by Sedgewick where you basically
- * alternate the direction of bubbling in each pass.
+ * alternate the direction of bubbling in each pass.  It handles the case where
+ * small elements are near the end of the input and otherwise require up to n-1
+ * passes to get to the beginning of the array.
  */
 pub fn shaker_sort(dat: &mut [i32]) {
 
@@ -570,6 +502,83 @@ pub fn bogo_sort(dat: &mut [i32]) {
         sorted = is_sorted(&dat);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * Naive method for selecting k-th smallest element.
+ *
+ * Just sorts and grabs.
+ */
+pub fn naive_select(dat: &mut [i32], k: usize) -> i32 {
+    assert!(k < dat.len(), "k-th element not in data bounds");
+    quick_sort(dat);
+    dat[k]
+}
+
+/*
+ * Quickselect with random pivoting.
+ *
+ * This picks the k-th smallest element from values in the array.
+ *
+ * Algorithm has same basic idea of quicksort, but you don't have to fully sort
+ * the array.  Instead observe that each partition sweep guarantees that the
+ * pivot will be placed in the correct, final location.  So each time you check
+ * where the kth element falls relative to the pivot and only recurse on that
+ * side.  You stop once the pivot=kth element.
+ */
+pub fn quick_select(dat: &mut [i32], k: usize) -> i32 {
+    assert!(k < dat.len(), "k-th element not in data bounds");
+
+    let max = dat.len();
+    quick_select_int(dat, 0, max, k);
+    dat[k]
+}
+
+fn quick_select_int(dat: &mut [i32], min: usize, max: usize, k: usize) {
+    assert!(min <= max, "qselect min extent gt max extent");
+    assert!(max <= dat.len(), "qselect max extent gt vector len");
+
+    // recursion base case
+    if max - min < 2 {
+        return;
+    }
+
+    // random pivot
+    dat.swap(min, rand::thread_rng().gen_range(min, max));
+    let pidx = partition(&mut dat[min..max]) + min;
+
+    // process only subpartition needed to position kth element
+    if k < pidx {
+        quick_select_int(dat, min, pidx, k);
+    } else if k > pidx {
+        quick_select_int(dat, pidx+1, max, k);
+    } else {
+        return;
+    }
+}
+
+
+
+
+
+
+
 
 /*
  * Binary search.  Input must already be sorted.
@@ -788,48 +797,6 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
     (lidx, ridx)
 }
 
-/*
- * Smarter O(n) algorithm for finding largest subsequence.
- *
- * The basic idea is using running sums to propagate information as you sweep
- * the array.  You sweep once from left-to-right to find the largest possible
- * sum.  Then you sweep the other direction to find where that sum starts.
- *
- * -- my algorithm is wrong!  see the deep valley test on why
- */
-pub fn largest_subseq_sweep(dat: &[i32]) -> (usize, usize) {
-
-    if dat.len() == 0 {
-        return (0,0);
-    }
-
-    // running sum left-to-right tracking largest value seen
-    let mut ridx = 0;
-    let mut maxsum = dat[0];
-    let mut cursum = dat[0];
-    for i in 1..dat.len() {
-        cursum += dat[i];
-        if cursum >= maxsum {
-            maxsum = cursum;
-            ridx = i;
-        }
-    }
-
-    // from largest value sweep right-to-left to find other extent
-    let mut lidx = ridx;
-    maxsum = dat[ridx];
-    cursum = dat[ridx];
-    for j in 1..ridx+1 {
-        cursum += dat[ridx-j];
-        if cursum >= maxsum {
-            maxsum = cursum;
-            lidx = ridx-j;
-        }
-    }
-
-    (lidx,ridx+1)
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -1016,6 +983,36 @@ mod tests {
         sort_eval(5000, heap_sort);
     }
 
+    #[test]
+    fn test_merge_sort() {
+        sort_eval(5000, merge_sort);
+    }
+
+    #[test]
+    fn test_insertion_sort() {
+        sort_eval(5000, insertion_sort);
+    }
+
+    #[test]
+    fn test_selection_sort() {
+        sort_eval(5000, selection_sort);
+    }
+
+    #[test]
+    fn test_shaker_sort() {
+        sort_eval(5000, shaker_sort);
+    }
+
+    #[test]
+    fn test_bubble_sort() {
+        sort_eval(5000, bubble_sort);
+    }
+
+    #[test]
+    fn test_bogo_sort() {
+        sort_eval(6, bogo_sort);
+    }
+
 
 
 
@@ -1052,36 +1049,6 @@ mod tests {
     fn test_quick_select_degenerate() {
         let mut v1: Vec<i32> = vec![42];
         assert!(quick_select(&mut v1, 0) == 42);
-    }
-
-    #[test]
-    fn test_merge_sort() {
-        sort_eval(5000, merge_sort);
-    }
-
-    #[test]
-    fn test_insertion_sort() {
-        sort_eval(5000, insertion_sort);
-    }
-
-    #[test]
-    fn test_selection_sort() {
-        sort_eval(5000, selection_sort);
-    }
-
-    #[test]
-    fn test_shaker_sort() {
-        sort_eval(5000, shaker_sort);
-    }
-
-    #[test]
-    fn test_bubble_sort() {
-        sort_eval(5000, bubble_sort);
-    }
-
-    #[test]
-    fn test_bogo_sort() {
-        sort_eval(6, bogo_sort);
     }
 
     #[test]
@@ -1254,10 +1221,5 @@ mod tests {
     #[test]
     fn test_largest_subseq_naive() {
         largest_subseq_eval(largest_subseq_naive);
-    }
-
-    #[test]
-    fn test_largest_subseq_sweep() {
-        largest_subseq_eval(largest_subseq_sweep);
     }
 }
