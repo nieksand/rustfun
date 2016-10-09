@@ -46,17 +46,61 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 /*
  * Heap's permutations
  *
- * Generates all possible permutations of a sequence.  Each iteration requires
- * only a single swap of elements.
+ * Generates all possible permutations of a sequence with each iteration
+ * requiring only a single swap of elements.
  *
- * The intuition behind the algorithm is this:
- * 
+ * The inductive reasoning:
+ *
+ * - permutation of 1 element array is a base case (n=1)
+ *
+ * - assume you have method to permute an n-1 element array
+ *
+ * - generate permutation for n element array by holding nth element fixed and
+ *   permuting n-1 elements.  Then swap n and one of n-1 and permute again. 
+ *   Repeat this process until each of the n-1th elements has held the nth 
+ *   position.
+ *
+ * A direct implementation leads to a very understandable algorithm.  Generate
+ * permutations using the nth element as-is.  Then looping with i=0..upto_idx:
+ * swap the ith and upto_idx values, generate permutations, swap ith and
+ * upto_idx values back.  
+ *
+ * The version of this algorithm you find in the paper and wikipedia avoid the
+ * swap-back operation by branching instead on odd/even permutation indices.
  *
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
 pub fn heaps_permutations(dat: &mut [i32]) {
-    // not yet implemented
+	print!("\n");
+    let upto_idx = dat.len()-1;
+	heaps_permutations_int(dat, upto_idx)
+}
+
+fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize) {
+	// permuting up to index 0 (inclusive) is base case
+	if upto_idx == 0 {
+		print!("meow: {:?}\n", dat);
+		return;
+	}
+
+	// generate permutations given last element
+	heaps_permutations_int(dat, upto_idx-1);
+
+	// swap from n-1th to nth, generate permutations
+	for i in 0..upto_idx {
+		// swap in
+		let t = dat[i];
+		dat[i] = dat[upto_idx];
+		dat[upto_idx] = t;
+
+		heaps_permutations_int(dat, upto_idx-1);
+
+		// swap out
+		let t = dat[i];
+		dat[i] = dat[upto_idx];
+		dat[upto_idx] = t;
+	}
 }
 
 /*
@@ -846,6 +890,13 @@ mod tests {
         fisher_yates_shuffle(&mut v3);
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
+
+	#[test]
+	fn test_heaps_permutations() {
+		let mut vals = vec![1,2,3];
+		heaps_permutations(&mut vals);
+		assert!(true == false);
+	}
 
     // runs arbitrary majority vote function through test battery 
     fn majority_eval<F>(majorityfn: F)
