@@ -52,9 +52,9 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  *   Odd-length:  swap [0,n] after each iteration
  *   Even-length: swap [i,n] after each iteration
  *
- *
- * Why?!?
- *
+ * An explanation of how differing length sequences permute and why they require
+ * different swap strategies can be found here:
+ *   https://webcms3.cse.unsw.edu.au/COMP9021/15s2/resources/1544
  *
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
