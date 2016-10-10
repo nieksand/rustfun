@@ -79,21 +79,30 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
-pub fn heaps_permutations(dat: &mut [i32]) {
-    print!("\n");
+pub fn heaps_permutations<F>(dat: &mut [i32], gathercb: F)
+	where F: FnMut(&mut [i32]) -> () {
+
+	// degenerate case
+	if dat.len() == 0 {
+		return
+	}
+
+	// upto_idx is the inclusive index up to which we permute values
     let upto_idx = dat.len()-1;
-    heaps_permutations_int(dat, upto_idx)
+    heaps_permutations_int(dat, upto_idx, gathercb)
 }
 
-fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize) {
+fn heaps_permutations_int<F>(dat: &mut [i32], upto_idx: usize, gathercb: F)
+	where F: FnMut(&mut [i32]) -> () {
+
     // permuting up to index 0 (inclusive) is base case
     if upto_idx == 0 {
-        print!("meow: {:?}\n", dat);
+		// INVOKE CALLBACK
         return;
     }
 
     // generate permutations given last element
-    heaps_permutations_int(dat, upto_idx-1);
+    heaps_permutations_int(dat, upto_idx-1, gathercb);
 
     // swap from n-1th to nth, generate permutations
     for i in 0..upto_idx {
@@ -102,7 +111,7 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize) {
         dat[i] = dat[upto_idx];
         dat[upto_idx] = t;
 
-        heaps_permutations_int(dat, upto_idx-1);
+        heaps_permutations_int(dat, upto_idx-1, gathercb);
 
         // swap out
         let t = dat[i];
@@ -847,6 +856,7 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+	use std::collections::HashSet;
 
     #[test]
     fn test_fisher_yates_shuffle() {
@@ -901,9 +911,24 @@ mod tests {
 
     #[test]
     fn test_heaps_permutations() {
-        let mut vals = vec![1,2,3,4];
-        heaps_permutations(&mut vals);
-        assert!(true == false);
+//		for n in 1..6 {
+//			// n factorial
+//			let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
+//
+//			// gathers generated permutations in hashset
+//			let mut results = HashSet::new();
+//			let gathercb = |x| {
+//				results.insert(x);
+//			};
+//
+//			let mut input: Vec<i32> = (0..n).collect(); 
+//			heaps_permutations(&mut input, gathercb);
+//
+//			//let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
+//			//assert!(results.len() == expected_cnt, errmsg);
+//		}
+//
+//		// test degenerate case
     }
 
     // runs arbitrary majority vote function through test battery
