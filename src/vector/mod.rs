@@ -79,7 +79,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
-pub fn heaps_permutations(dat: &mut [i32], gathercb: &Fn(&mut [i32]) -> ()) {
+pub fn heaps_permutations(dat: &mut [i32], gathercb: &mut FnMut(&mut [i32]) -> ()) {
 
 	// degenerate case
 	if dat.len() == 0 {
@@ -91,7 +91,7 @@ pub fn heaps_permutations(dat: &mut [i32], gathercb: &Fn(&mut [i32]) -> ()) {
     heaps_permutations_int(dat, upto_idx, gathercb)
 }
 
-fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &Fn(&mut [i32]) -> ()) {
+fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut(&mut [i32]) -> ()) {
 
     // permuting up to index 0 (inclusive) is base case
     if upto_idx == 0 {
@@ -920,7 +920,7 @@ mod tests {
 			};
 	
 			let mut input: Vec<i32> = (0..n as i32).collect(); 
-			heaps_permutations(&mut input, &gathercb);
+			heaps_permutations(&mut input, &mut gathercb);
 
 			let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
 			assert!(results.len() == expected_cnt, errmsg);
