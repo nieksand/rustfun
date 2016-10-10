@@ -42,10 +42,8 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  *   Repeat this process until each of the n-1th elements has held the nth
  *   position.
  *
- * A direct implementation leads to a very understandable algorithm but with an
- * extra swap.  Generate permutations using the nth element as-is.  Then looping
- * with i=0..upto_idx: swap the ith and upto_idx values, generate permutations,
- * swap ith and upto_idx values back.
+ * See nieks_permutations for a simple implementation of the above idea which
+ * relies on two swaps per iteration.
  *
  * The actual algorithm avoids the swap-back by exploiting the specific n-1
  * permutation to place a distinct element in the nth position.
