@@ -908,8 +908,9 @@ mod tests {
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
 
-    #[test]
-    fn test_heaps_permutations() {
+	fn permutation_eval<F>(permfn: F)
+		where F: Fn(&mut [i32], &mut FnMut(&mut [i32]) -> ()) -> () {
+
         for n in 0..6 {
             // n factorial
             let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
@@ -926,12 +927,17 @@ mod tests {
                 };
 
                 let mut input: Vec<i32> = (0..n as i32).collect();
-                heaps_permutations(&mut input, &mut gathercb);
+                permfn(&mut input, &mut gathercb);
             }
 
             let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
             assert!(results.len() == expected_cnt, errmsg);
         }
+	}
+
+    #[test]
+    fn test_heaps_permutations() {
+		permutation_eval(heaps_permutations);
     }
 
     // runs arbitrary majority vote function through test battery
