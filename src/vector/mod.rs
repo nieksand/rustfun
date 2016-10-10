@@ -79,8 +79,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
  */
-pub fn heaps_permutations<F>(dat: &mut [i32], gathercb: F)
-	where F: FnMut(&mut [i32]) -> () {
+pub fn heaps_permutations(dat: &mut [i32], gathercb: &Fn(&mut [i32]) -> ()) {
 
 	// degenerate case
 	if dat.len() == 0 {
@@ -92,8 +91,7 @@ pub fn heaps_permutations<F>(dat: &mut [i32], gathercb: F)
     heaps_permutations_int(dat, upto_idx, gathercb)
 }
 
-fn heaps_permutations_int<F>(dat: &mut [i32], upto_idx: usize, gathercb: F)
-	where F: FnMut(&mut [i32]) -> () {
+fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &Fn(&mut [i32]) -> ()) {
 
     // permuting up to index 0 (inclusive) is base case
     if upto_idx == 0 {
@@ -911,24 +909,28 @@ mod tests {
 
     #[test]
     fn test_heaps_permutations() {
-//		for n in 1..6 {
-//			// n factorial
-//			let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
-//
-//			// gathers generated permutations in hashset
-//			let mut results = HashSet::new();
-//			let gathercb = |x| {
-//				results.insert(x);
-//			};
-//
-//			let mut input: Vec<i32> = (0..n).collect(); 
-//			heaps_permutations(&mut input, gathercb);
-//
-//			//let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
-//			//assert!(results.len() == expected_cnt, errmsg);
-//		}
-//
-//		// test degenerate case
+		for n in 1..6 {
+			// n factorial
+			let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
+
+			// gathers generated permutations in hashset
+			let mut results = HashSet::new();
+			results.insert("potato");
+
+			{
+				let gathercb = |x| {
+					results.insert(x);
+				};
+	
+				let mut input: Vec<i32> = (0..n as i32).collect(); 
+				//heaps_permutations(&mut input, &mut gathercb);
+			}
+
+			let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
+			assert!(results.len() == expected_cnt, errmsg);
+		}
+
+		// test degenerate case
     }
 
     // runs arbitrary majority vote function through test battery
