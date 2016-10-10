@@ -83,19 +83,23 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut
     // generate permutations given last element
     heaps_permutations_int(dat, upto_idx-1, gathercb);
 
-    // swap from n-1th to nth, generate permutations
-    for i in 0..upto_idx {
-        // swap in
-        let t = dat[i];
-        dat[i] = dat[upto_idx];
-        dat[upto_idx] = t;
-
-        heaps_permutations_int(dat, upto_idx-1, gathercb);
-
-        // swap out
-        let t = dat[i];
-        dat[i] = dat[upto_idx];
-        dat[upto_idx] = t;
+    // swap from n-1th to nth, generating permutations
+    if upto_idx % 2 == 0 {
+        // odd case cycles our pick for nth element to 0 index for us
+        for _ in 0..upto_idx {
+            let t = dat[0];
+            dat[0] = dat[upto_idx];
+            dat[upto_idx] = t;
+            heaps_permutations_int(dat, upto_idx-1, gathercb);
+        }
+    } else {
+        // even case requires us to walk which cell we pick nth element from
+        for i in 0..upto_idx {
+            let t = dat[i];
+            dat[i] = dat[upto_idx];
+            dat[upto_idx] = t;
+            heaps_permutations_int(dat, upto_idx-1, gathercb);
+        }
     }
 }
 
@@ -942,8 +946,8 @@ mod tests {
         assert!(v3.len() == 2, "two-element vector same size post-shuffle");
     }
 
-	fn permutation_eval<F>(permfn: F)
-		where F: Fn(&mut [i32], &mut FnMut(&mut [i32]) -> ()) -> () {
+    fn permutation_eval<F>(permfn: F)
+        where F: Fn(&mut [i32], &mut FnMut(&mut [i32]) -> ()) -> () {
 
         for n in 0..6 {
             // n factorial
@@ -967,16 +971,16 @@ mod tests {
             let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
             assert!(results.len() == expected_cnt, errmsg);
         }
-	}
+    }
 
     #[test]
     fn test_heaps_permutations() {
-		permutation_eval(heaps_permutations);
+        permutation_eval(heaps_permutations);
     }
 
     #[test]
     fn test_nieks_permutations() {
-		permutation_eval(nieks_permutations);
+        permutation_eval(nieks_permutations);
     }
 
     // runs arbitrary majority vote function through test battery
