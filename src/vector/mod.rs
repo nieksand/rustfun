@@ -855,6 +855,7 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 mod tests {
     use super::*;
 	use std::collections::HashSet;
+//	use std::rc::Rc;
 
     #[test]
     fn test_fisher_yates_shuffle() {
@@ -915,23 +916,19 @@ mod tests {
 
 			// gathers generated permutations in hashset
 			let mut results = HashSet::new();
-			results.insert("potato");
-
-			{
-				let gathercb = |x: &mut [i32]| {
-					print!("{:?}\n", x);
-				//	results.insert(x);
-				};
+			let gathercb = |x: &mut [i32]| {
+				results.insert(x);
+			};
 	
-				let mut input: Vec<i32> = (0..n as i32).collect(); 
-				heaps_permutations(&mut input, &gathercb);
-			}
+			let mut input: Vec<i32> = (0..n as i32).collect(); 
+			heaps_permutations(&mut input, &gathercb);
 
 			let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
 			assert!(results.len() == expected_cnt, errmsg);
 		}
 
 		// test degenerate case
+		assert!(false==true);
     }
 
     // runs arbitrary majority vote function through test battery
