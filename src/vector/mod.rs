@@ -81,12 +81,13 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  */
 pub fn heaps_permutations(dat: &mut [i32], gathercb: &mut FnMut(&mut [i32]) -> ()) {
 
-	// degenerate case
-	if dat.len() == 0 {
-		return
-	}
+    // degenerate case
+    if dat.len() == 0 {
+        gathercb(dat);
+        return
+    }
 
-	// upto_idx is the inclusive index up to which we permute values
+    // upto_idx is the inclusive index up to which we permute values
     let upto_idx = dat.len()-1;
     heaps_permutations_int(dat, upto_idx, gathercb)
 }
@@ -95,7 +96,7 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut
 
     // permuting up to index 0 (inclusive) is base case
     if upto_idx == 0 {
-		gathercb(dat);
+        gathercb(dat);
         return;
     }
 
@@ -854,7 +855,7 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
-	use std::collections::HashSet;
+    use std::collections::HashSet;
 
     #[test]
     fn test_fisher_yates_shuffle() {
@@ -909,25 +910,28 @@ mod tests {
 
     #[test]
     fn test_heaps_permutations() {
-		for n in 1..6 {
-			// n factorial
-			let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
+        for n in 0..6 {
+            // n factorial
+            let expected_cnt: usize = (1..n+1).fold(1, |acc, val| acc * val);
 
-			// gathers generated permutations in hashset
-			let mut results = HashSet::new();
-			let gathercb = |x: &mut [i32]| {
-				results.insert(x);
-			};
-	
-			let mut input: Vec<i32> = (0..n as i32).collect(); 
-			heaps_permutations(&mut input, &mut gathercb);
+            // gathers generated permutations in hashset
+            let mut results = HashSet::new();
 
-			let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
-			assert!(results.len() == expected_cnt, errmsg);
-		}
+            // scope controls borrow of results hash set
+            {
+                let mut gathercb = |x: &mut [i32]| {
+                    let mut tmp: Vec<i32> = Vec::new();
+                    tmp.extend_from_slice(&x);
+                    results.insert(Box::new(tmp));
+                };
 
-		// test degenerate case
-		assert!(false==true);
+                let mut input: Vec<i32> = (0..n as i32).collect();
+                heaps_permutations(&mut input, &mut gathercb);
+            }
+
+            let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
+            assert!(results.len() == expected_cnt, errmsg);
+        }
     }
 
     // runs arbitrary majority vote function through test battery
