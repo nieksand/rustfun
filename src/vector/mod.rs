@@ -95,7 +95,7 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &Fn(&mut [
 
     // permuting up to index 0 (inclusive) is base case
     if upto_idx == 0 {
-		// INVOKE CALLBACK
+		gathercb(dat);
         return;
     }
 
@@ -918,12 +918,13 @@ mod tests {
 			results.insert("potato");
 
 			{
-				let gathercb = |x| {
-					results.insert(x);
+				let gathercb = |x: &mut [i32]| {
+					print!("{:?}\n", x);
+				//	results.insert(x);
 				};
 	
 				let mut input: Vec<i32> = (0..n as i32).collect(); 
-				//heaps_permutations(&mut input, &mut gathercb);
+				heaps_permutations(&mut input, &gathercb);
 			}
 
 			let errmsg = format!("distinct permutation count !={} for n={}", expected_cnt, n);
