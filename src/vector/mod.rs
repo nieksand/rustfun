@@ -1,21 +1,3 @@
-/*
- * Todo:
- *   1) Radix sort
- *   2) Heap's Permutations
- *   3) Shell sort
- *   4) In-situ permutation
- *   5) Indirect sort
- *   6) List sorts
- *   7) Templatized hybrid sort helper
- *   8) External sort
- *   9) Three way quicksort
- *   10) Templatize the sorts
- *
- * Maybe:
- *   1) Interpolation Search
- *   2) Variance calculation
- *   3) Approximate Counting (Morris)
- */
 extern crate rand;
 
 use self::rand::Rng;
@@ -44,7 +26,7 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 }
 
 /*
- * Heap's permutations
+ * Heap's permutations.
  *
  * Generates all permutations of a sequence with each iteration requiring only a
  * single swap of elements.
@@ -111,6 +93,60 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut
         dat[upto_idx] = t;
 
         heaps_permutations_int(dat, upto_idx-1, gathercb);
+
+        // swap out
+        let t = dat[i];
+        dat[i] = dat[upto_idx];
+        dat[upto_idx] = t;
+    }
+}
+
+/*
+ * Niek's permutations.
+ *
+ * I developed this while learning Heap's method--it is almost certainly not
+ * an innovation but I lack a better name.
+ *
+ * The approach uses the inductive method of Heap, but rather than rely on the
+ * even/odd cyclic behavior to pick the nth element, we simply swap-back after
+ * each iteration.  See docs on heaps_permutations for additional background.
+ *
+ * For me, this was a more intuitive way to think about the problem.  There is
+ * also a chance that this is faster than Heap's algorithm.  While we do twice
+ * the swaps, we remove the branch on even/odd.  Benchmarks coming soon!
+ */
+pub fn nieks_permutations(dat: &mut [i32], gathercb: &mut FnMut(&mut [i32]) -> ()) {
+
+    // degenerate case
+    if dat.len() == 0 {
+        gathercb(dat);
+        return
+    }
+
+    // upto_idx is the inclusive index up to which we permute values
+    let upto_idx = dat.len()-1;
+    nieks_permutations_int(dat, upto_idx, gathercb)
+}
+
+fn nieks_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut(&mut [i32]) -> ()) {
+
+    // permuting up to index 0 (inclusive) is base case
+    if upto_idx == 0 {
+        gathercb(dat);
+        return;
+    }
+
+    // generate permutations given last element
+    nieks_permutations_int(dat, upto_idx-1, gathercb);
+
+    // swap from n-1th to nth, generate permutations
+    for i in 0..upto_idx {
+        // swap in
+        let t = dat[i];
+        dat[i] = dat[upto_idx];
+        dat[upto_idx] = t;
+
+        nieks_permutations_int(dat, upto_idx-1, gathercb);
 
         // swap out
         let t = dat[i];
@@ -938,6 +974,11 @@ mod tests {
     #[test]
     fn test_heaps_permutations() {
 		permutation_eval(heaps_permutations);
+    }
+
+    #[test]
+    fn test_nieks_permutations() {
+		permutation_eval(nieks_permutations);
     }
 
     // runs arbitrary majority vote function through test battery
