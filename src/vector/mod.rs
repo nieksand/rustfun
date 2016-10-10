@@ -855,7 +855,6 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
 mod tests {
     use super::*;
 	use std::collections::HashSet;
-//	use std::rc::Rc;
 
     #[test]
     fn test_fisher_yates_shuffle() {
