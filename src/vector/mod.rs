@@ -113,9 +113,9 @@ fn heaps_permutations_int(dat: &mut [i32], upto_idx: usize, gathercb: &mut FnMut
  * even/odd cyclic behavior to pick the nth element, we simply swap-back after
  * each iteration.  See docs on heaps_permutations for additional background.
  *
- * For me, this was a more intuitive way to think about the problem.  There is
- * also a chance that this is faster than Heap's algorithm.  While we do twice
- * the swaps, we remove the branch on even/odd.  Benchmarks coming soon!
+ * For me, this was a more intuitive way to think about the problem.  The
+ * performance penalty is only 1.05x relative to Heap's approach.  (We do twice
+ * the swaps but do less branching).
  */
 pub fn nieks_permutations(dat: &mut [i32], gathercb: &mut FnMut(&mut [i32]) -> ()) {
 
