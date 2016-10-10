@@ -46,8 +46,8 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
 /*
  * Heap's permutations
  *
- * Generates all possible permutations of a sequence with each iteration
- * requiring only a single swap of elements.
+ * Generates all permutations of a sequence with each iteration requiring only a
+ * single swap of elements.
  *
  * The inductive reasoning:
  *
@@ -60,13 +60,21 @@ pub fn fisher_yates_shuffle(dat: &mut [i32]) {
  *   Repeat this process until each of the n-1th elements has held the nth
  *   position.
  *
- * A direct implementation leads to a very understandable algorithm.  Generate
- * permutations using the nth element as-is.  Then looping with i=0..upto_idx:
- * swap the ith and upto_idx values, generate permutations, swap ith and
- * upto_idx values back.
+ * A direct implementation leads to a very understandable algorithm but with an
+ * extra swap.  Generate permutations using the nth element as-is.  Then looping
+ * with i=0..upto_idx: swap the ith and upto_idx values, generate permutations,
+ * swap ith and upto_idx values back.
  *
- * The version of this algorithm you find in the paper and wikipedia avoid the
- * swap-back operation by branching instead on odd/even permutation indices.
+ * The actual algorithm avoids the swap-back by exploiting the specific n-1
+ * permutation to place a distinct element in the nth position.
+ *
+ * Specifically if the subsequence is...
+ *   Odd-length:  swap [0,n] after each iteration
+ *   Even-length: swap [i,n] after each iteration
+ *
+ *
+ * Why?!?
+ *
  *
  * Heap, B. R. (1963). "Permutations by Interchanges". The Computer
  * Journal. 6 (3): 293–4. doi:10.1093/comjnl/6.3.293.
@@ -893,7 +901,7 @@ mod tests {
 
     #[test]
     fn test_heaps_permutations() {
-        let mut vals = vec![1,2,3];
+        let mut vals = vec![1,2,3,4];
         heaps_permutations(&mut vals);
         assert!(true == false);
     }
