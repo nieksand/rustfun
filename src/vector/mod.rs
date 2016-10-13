@@ -889,11 +889,53 @@ pub fn largest_subseq_naive(dat: &[i32]) -> (usize, usize) {
     (lidx, ridx)
 }
 
+/*
+ * Naive algorithm to compute ... mean and variance.
+ *
+ * It makes two passes over the data.  The first pass computes mean and then
+ * uses this in the second pass to compute variance.
+ */
+pub fn naive_mean_var(dat: &[i32]) -> (f64, f64) {
+
+	// element sum divided by element count
+	let sum: f64 = dat.iter().fold(0.0, |acc, val| acc + (*val as f64));
+	let mean = sum / (dat.len() as f64);
+
+	// sum of squared differences from mean
+	let variance_inner: f64 = dat.iter().fold(0.0, |acc, val| acc + (*val as f64 - mean)*(*val as f64 - mean));
+	let variance = variance_inner / (dat.len() as f64);
+	(mean, variance)
+}
+
+/*
+ * Provisional means algorithm.
+ *
+ * Computes mean and variance in a single pass over the data.  Besides the
+ * reduction in reads, it can also provide running updates on these values when
+ * working with streaming data.
+ *
+ * ---in progress---
+ */
+pub fn provisional_mean_var(dat: &[i32]) -> (f64, f64) {
+
+	if dat.len() == 0 {
+		return (0.0, 0.0);
+	}
+
+//	m_k = dat[0]
+//	s_k = dat[0]
+
+
+
+	(0.0,0.0)
+}
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use std::collections::HashSet;
+	use std::f64;
 
     #[test]
     fn test_fisher_yates_shuffle() {
@@ -1329,4 +1371,41 @@ mod tests {
     fn test_largest_subseq_naive() {
         largest_subseq_eval(largest_subseq_naive);
     }
+
+	// runs arbitrary mean/variance compute function through tests
+    fn mean_var_eval<F>(mvfn: F)
+        where F: Fn(&[i32]) -> (f64, f64) {
+
+		// all zeros sequence
+		let test = vec![0,0,0];
+		let (mean, variance) = mvfn(&test);
+        assert!(f64::abs(mean-0.0) < 1e-6);
+        assert!(f64::abs(variance-0.0) < 1e-6);
+
+		// constant valued sequence
+		let test = vec![3,3,3];
+		let (mean, variance) = mvfn(&test);
+        assert!(f64::abs(mean-3.0) < 1e-6);
+        assert!(f64::abs(variance-0.0) < 1e-6);
+
+		// constant valued sequence
+		let test = vec![1,2,3];
+		let (mean, variance) = mvfn(&test);
+        assert!(f64::abs(mean-2.0) < 1e-6);
+        assert!(f64::abs(variance-0.6666666666666) < 1e-6);
+
+		// empty array.. undefined but ensure no panic
+		let test = vec![];
+		let (_, _) = mvfn(&test);
+	}
+
+    #[test]
+	fn test_naive_mean_var() {
+		mean_var_eval(naive_mean_var);
+	}
+
+    #[test]
+	fn test_provisional_mean_var() {
+		mean_var_eval(provisional_mean_var);
+	}
 }
