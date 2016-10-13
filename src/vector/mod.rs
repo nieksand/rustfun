@@ -518,10 +518,15 @@ pub fn insertion_sort(dat: &mut [i32]) {
 }
 
 /*
- * Selection sort.  Quadratic and I have never encountered a real use case for
- * it.  Sedgewick points out that it does the minimum number of swaps, so is
- * plausible for huge items with small keys.  But honestly, just do an indirect
- * sort for that.
+ * Selection sort.
+ *
+ * Quadratic and I have never encountered a real use case for it.  Sedgewick
+ * points out that it does the minimum number of swaps, so is plausible for huge
+ * items with small keys.  But honestly, just do an indirect sort for that.
+ *
+ * Skiena points out that selection sort is the prelude to heap sort.  The
+ * latter just being a selection sort with a faster way (implicity binary heap)
+ * of picking the next element for the sorted region.
  */
 pub fn selection_sort(dat: &mut [i32]) {
     for i in 0..dat.len() {
