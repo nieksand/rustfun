@@ -911,29 +911,6 @@ pub fn naive_mean_var(dat: &[i32]) -> (f64, f64) {
     (mean, variance)
 }
 
-/*
- * Provisional means algorithm.
- *
- * Computes mean and variance in a single pass over the data.  Besides the
- * reduction in reads, it can also provide running updates on these values when
- * working with streaming data.
- *
- * ---in progress---
- */
-pub fn provisional_mean_var(dat: &[i32]) -> (f64, f64) {
-
-    if dat.len() == 0 {
-        return (0.0, 0.0);
-    }
-
-//    m_k = dat[0]
-//    s_k = dat[0]
-
-
-
-    (0.0,0.0)
-}
-
 
 #[cfg(test)]
 mod tests {
@@ -1413,10 +1390,5 @@ mod tests {
     #[test]
     fn test_naive_mean_var() {
         mean_var_eval(naive_mean_var);
-    }
-
-    #[test]
-    fn test_provisional_mean_var() {
-        mean_var_eval(provisional_mean_var);
     }
 }
