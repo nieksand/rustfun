@@ -1120,7 +1120,7 @@ mod tests {
     #[test]
     fn test_quick_sort_pathological() {
         // naive partition causes O(n^2) time and O(n) stack depth. 
-        let mut dat: Vec<i32> = vec![666; 10000];
+        let mut dat: Vec<i32> = vec![666; 1000000];
         quick_sort(&mut dat[..]);
     }
 
