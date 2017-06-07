@@ -1118,11 +1118,11 @@ mod tests {
     }
 
     #[test]
-	fn test_quick_sort_pathological() {
-		// naive partition causes O(n^2) time and O(n) stack depth. 
-		let mut dat: Vec<i32> = vec![666; 10000];
-		quick_sort(&mut dat[..]);
-	}
+    fn test_quick_sort_pathological() {
+        // naive partition causes O(n^2) time and O(n) stack depth. 
+        let mut dat: Vec<i32> = vec![666; 10000];
+        quick_sort(&mut dat[..]);
+    }
 
     #[test]
     fn test_make_implicit_max_heap() {
