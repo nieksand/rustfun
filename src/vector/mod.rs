@@ -249,7 +249,11 @@ pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
  *   [pivot, other values]
  *
  * The output has the array partitioned:
- *   [values <= pivot, pivot, values > pivot]
+ *   [values <= pivot, pivot, values >= pivot]
+ *
+ * Note that values equal to the pivot may end on either side of end.  On an
+ * input of all-equal elements, it ensures that the pivot goes roughly in the
+ * middle leaving a balanced recursion tree.
  *
  * It returns the final index of the pivot relative to the slice origin.
  *
@@ -259,25 +263,28 @@ pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
 pub fn partition(dat: &mut [i32]) -> usize {
     assert!(dat.len() > 0, "partition requires pivot in 0th position");
 
-    // bounds (min,pleft] and (pright,max) are partitioned.
-    let mut pleft = 0;
-    let mut pright = dat.len();
-
-    while pleft+1 < pright {
-        // value already in correct partition
-        if dat[pleft+1] <= dat[0] {
-            pleft += 1;
-        }
-        // value belongs in other partition
-        else {
-            dat.swap(pleft+1,pright-1);
-            pright -= 1;
-        }
-    }
-
-    // pivot lives at end of left partition
-    dat.swap(0,pleft);
-    pleft
+	let mut pleft = 0;
+	let mut pright = dat.len();
+	loop {
+		loop {
+			pleft += 1;
+			if pleft >= dat.len() || dat[pleft] >= dat[0] {
+				break;
+			}
+		}
+		loop {
+			pright -= 1;
+			if dat[pright] <= dat[0] {
+				break;
+			}
+		}
+		if pright < pleft {
+			break;
+		}
+		dat.swap(pleft, pright);
+	}
+	dat.swap(0,pright);
+	pright
 }
 
 /*
@@ -485,7 +492,10 @@ fn merge_sort_int(dat: &mut [i32], min: usize, max: usize, scratch: &mut Vec<i32
 }
 
 /*
- * Insertion sort.  Stable and can be made online, but quadratic.
+ * Insertion sort.  Can be made stable and/or online, but always quadratic.
+ *
+ * This particular implementation uses a sentinel to reduce branches on the
+ * inner loop.  As written, the sentinel placement breaks the stable property.
  */
 pub fn insertion_sort(dat: &mut [i32]) {
     // nothing to do
@@ -514,6 +524,48 @@ pub fn insertion_sort(dat: &mut [i32]) {
         }
         dat[j] = tmp;
     }
+}
+
+/*
+ * Binary insertion sort.
+ *
+ * This variant of insertion sort uses a binary search to find the destination
+ * for each element.  This reduces the number of comparisons, but the number of
+ * swaps stays the same.
+ *
+ * This implementation is a stable sort.
+ */
+pub fn binary_insertion_sort(dat: &mut [i32]) {
+    // nothing to do
+    if dat.len() < 2 {
+        return;
+    }
+
+	// outer loop tracks sorted region
+	for i in 1..dat.len() {
+		// already in right place
+		if dat[i] >= dat[i-1] {
+			continue
+		}
+
+        // upper bound by binary search
+        let mut beg = 0;
+        let mut end = i;
+        while beg < end {
+            let probe = (beg + end) / 2;
+
+            if dat[i] < dat[probe] {
+                end = probe;
+            } else {
+                beg = probe + 1;
+            }
+        }
+
+        // slide to correct place
+		for j in 0..(i-beg) {
+			dat.swap(i-j,i-j-1);
+		}
+	}
 }
 
 /*
@@ -1152,6 +1204,11 @@ mod tests {
     #[test]
     fn test_insertion_sort() {
         sort_eval(5000, insertion_sort);
+    }
+
+    #[test]
+    fn test_binary_insertion_sort() {
+        sort_eval(5000, binary_insertion_sort);
     }
 
     #[test]

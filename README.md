@@ -7,7 +7,7 @@ code could be satisfied by the standard library instead.
 Algorithms operating on vectors.  Most can be further generalized to deal with
 more arbitrary collections and types.
 
-Sorts: quick, heap, merge, insertion, selection, bubble, bogo, shaker.
+Sorts: quick, heap, merge, insertion, selection, bubble, bogo, shaker, binary insertion.
 
 Searches: binary, jump
 
