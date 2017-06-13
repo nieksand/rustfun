@@ -263,28 +263,28 @@ pub fn hash_majority_vote(dat: &[i32]) -> Option<i32> {
 pub fn partition(dat: &mut [i32]) -> usize {
     assert!(dat.len() > 0, "partition requires pivot in 0th position");
 
-	let mut pleft = 0;
-	let mut pright = dat.len();
-	loop {
-		loop {
-			pleft += 1;
-			if pleft >= dat.len() || dat[pleft] >= dat[0] {
-				break;
-			}
-		}
-		loop {
-			pright -= 1;
-			if dat[pright] <= dat[0] {
-				break;
-			}
-		}
-		if pright < pleft {
-			break;
-		}
-		dat.swap(pleft, pright);
-	}
-	dat.swap(0,pright);
-	pright
+    let mut pleft = 0;
+    let mut pright = dat.len();
+    loop {
+        loop {
+            pleft += 1;
+            if pleft >= dat.len() || dat[pleft] >= dat[0] {
+                break;
+            }
+        }
+        loop {
+            pright -= 1;
+            if dat[pright] <= dat[0] {
+                break;
+            }
+        }
+        if pright < pleft {
+            break;
+        }
+        dat.swap(pleft, pright);
+    }
+    dat.swap(0,pright);
+    pright
 }
 
 /*
@@ -541,12 +541,12 @@ pub fn binary_insertion_sort(dat: &mut [i32]) {
         return;
     }
 
-	// outer loop tracks sorted region
-	for i in 1..dat.len() {
-		// already in right place
-		if dat[i] >= dat[i-1] {
-			continue
-		}
+    // outer loop tracks sorted region
+    for i in 1..dat.len() {
+        // already in right place
+        if dat[i] >= dat[i-1] {
+            continue
+        }
 
         // upper bound by binary search
         let mut beg = 0;
@@ -562,10 +562,10 @@ pub fn binary_insertion_sort(dat: &mut [i32]) {
         }
 
         // slide to correct place
-		for j in 0..(i-beg) {
-			dat.swap(i-j,i-j-1);
-		}
-	}
+        for j in 0..(i-beg) {
+            dat.swap(i-j,i-j-1);
+        }
+    }
 }
 
 /*
